@@ -7,7 +7,7 @@ from pygame.locals import (
 from player import Player
 from ball import Ball
 from constants import (
-    SCREEN_HEIGHT, SCREEN_WIDTH, PLAYERMOVE
+    SCREEN_HEIGHT, SCREEN_WIDTH, PLAYERFIRE, REACHEDBORDER
 )
 
 
@@ -39,9 +39,14 @@ while run:
         if event.type == QUIT:
             run = False
         
-        if not is_rolling and event.type == PLAYERMOVE and event.is_left == ball.is_left:
+        if not is_rolling and event.type == PLAYERFIRE and event.is_left == ball.is_left:
+            print("pushed")
             ball.push_ball()
             is_rolling = True
+        
+        if event.type == REACHEDBORDER:
+            ball.reset(event.is_left)
+            is_rolling = False
 
     dt = clock.tick() / 1000 * 60
     players.update(pygame.key.get_pressed(), dt)
