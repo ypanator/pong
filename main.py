@@ -12,6 +12,7 @@ from constants import (
 
 
 pygame.init()
+pygame.display.set_caption("pong")
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 screen.fill("black")
 
@@ -40,8 +41,8 @@ while run:
             run = False
         
         if not is_rolling and event.type == PLAYERFIRE and event.is_left == ball.is_left:
-            print("pushed")
-            ball.push_ball()
+            print("fired")
+            ball.fire()
             is_rolling = True
         
         if event.type == REACHEDBORDER:
@@ -50,8 +51,7 @@ while run:
 
     dt = clock.tick() / 1000 * 60
     players.update(pygame.key.get_pressed(), dt)
-    if is_rolling:
-        ball.update(dt)
+    ball.update(dt, is_rolling, player_left.pos if ball.is_left else player_right.pos)
         
     screen.fill("black")
     for ent in drawables:
