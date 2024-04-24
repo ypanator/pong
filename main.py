@@ -41,17 +41,19 @@ while run:
             run = False
         
         if not is_rolling and event.type == PLAYERFIRE and event.is_left == ball.is_left:
-            print("fired")
-            ball.fire()
+            ball.launch()
             is_rolling = True
-        
+
         if event.type == REACHEDBORDER:
+            if event.is_left: player_right.score += 1
+            else: player_left.score += 1
+            print(f"{player_right.score = } {player_left.score = }")
             ball.reset(event.is_left)
             is_rolling = False
 
     dt = clock.tick() / 1000 * 60
     players.update(pygame.key.get_pressed(), dt)
-    ball.update(dt, is_rolling, player_left.pos if ball.is_left else player_right.pos)
+    ball.update(dt, is_rolling, player_left.pos if ball.is_left else player_right.pos, players)
         
     screen.fill("black")
     for ent in drawables:

@@ -21,6 +21,7 @@ class Player(pygame.sprite.Sprite):
             SCREEN_HEIGHT // 2
         ]        
         self.rect = self.surf.get_rect(center = (self.pos[0], self.pos[1]))
+        self.score = 0
 
 
     def update(self, pressed_keys, dt):
