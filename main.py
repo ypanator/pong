@@ -5,6 +5,7 @@ from pygame.locals import (
 )
 
 from player import Player
+from score import Score
 from ball import Ball
 from constants import (
     SCREEN_HEIGHT, SCREEN_WIDTH, PLAYERFIRE, REACHEDBORDER
@@ -19,10 +20,12 @@ screen.fill("black")
 ball = Ball()
 player_left = Player(True)
 player_right = Player(False)
+score_left = Score(True)
+score_right = Score(False)
 
 drawables = pygame.sprite.Group()
 players = pygame.sprite.Group()
-drawables.add(player_left, player_right, ball)
+drawables.add(player_left, player_right, ball, score_left, score_right)
 players.add(player_left, player_right)
 
 clock = pygame.time.Clock()
@@ -45,8 +48,13 @@ while run:
             is_rolling = True
 
         if event.type == REACHEDBORDER:
-            if event.is_left: player_right.score += 1
-            else: player_left.score += 1
+            if event.is_left: 
+                player_right.score += 1
+                score_right.update(player_right.score)
+            else: 
+                player_left.score += 1
+                score_left.update(player_left.score)
+
             print(f"{player_right.score = } {player_left.score = }")
             ball.reset(event.is_left)
             is_rolling = False
