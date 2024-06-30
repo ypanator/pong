@@ -5,7 +5,7 @@ from constants import (
 
 class Score(pygame.sprite.Sprite):
     pygame.font.init()
-    font = pygame.font.SysFont(pygame.font.get_default_font(), FONT_SIZE)
+    font = pygame.font.Font("retro_font.ttf", FONT_SIZE)
 
     def _render(self, score):
         return self.font.render(str(score), False, "white", "black")
