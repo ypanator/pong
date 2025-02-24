@@ -1,16 +1,25 @@
 import pygame
 import random
 from constants import (
-    SCREEN_HEIGHT, SCREEN_WIDTH, REACHEDBORDER, BALL_OFFSET, RADIUS, START_VEL
+    SCREEN_HEIGHT, SCREEN_WIDTH, REACHED_BORDER_EVENT, BALL_OFFSET, 
+    BALL_RADIUS, BALL_VEL, SFX_VOLUME, BALL_PIXELS
 )
 
 class Ball(pygame.sprite.Sprite):
     
     def __init__(self):
         super().__init__()
-        self.surf = pygame.Surface((RADIUS * 2, RADIUS * 2))
-        self.surf.fill("black")
-        pygame.draw.circle(self.surf, "white", (RADIUS, RADIUS), RADIUS)
+
+        self.hit_sound = pygame.mixer.Sound("audio\hit.wav")
+        self.launch_sound = pygame.mixer.Sound("audio\launch.wav")
+        self.hit_sound.set_volume(SFX_VOLUME)
+        self.launch_sound.set_volume(SFX_VOLUME)
+
+        small_ball = pygame.Surface((BALL_PIXELS * 2, BALL_PIXELS * 2))
+        small_ball.fill("black")
+        pygame.draw.circle(small_ball, "white", (BALL_PIXELS, BALL_PIXELS), BALL_PIXELS)
+        
+        self.surf = pygame.transform.scale(small_ball, (BALL_RADIUS * 2, BALL_RADIUS * 2))
         self.surf.set_colorkey("black")
 
         self.is_left = random.choice([True, False])
@@ -19,24 +28,35 @@ class Ball(pygame.sprite.Sprite):
             SCREEN_HEIGHT // 2
         ]
         self.rect = self.surf.get_rect(center = (self.pos[0], self.pos[1]))
+        self.hit_bottom, self.hit_top = False, False
         self.cur_vel = [0, 0]
 
 
     def launch(self):
+        self.launch_sound.play()
         if self.is_left:
-            self.cur_vel = START_VEL
+            self.cur_vel = BALL_VEL
         else:
-            self.cur_vel = [-START_VEL[0], START_VEL[1]]
+            self.cur_vel = [-BALL_VEL[0], BALL_VEL[1]]
         
 
     def handle_border(self):
-        if self.pos[1] == self.surf.get_height() / 2 or self.pos[1] == SCREEN_HEIGHT - self.surf.get_height() / 2:
+        if self.rect.top <= 0 and not self.hit_top:
+            self.hit_top, self.hit_bottom = True, False
+            # print("playing sound")
+            self.hit_sound.play()
             self.cur_vel[1] *= -1
+        
+        if self.rect.bottom >= SCREEN_HEIGHT and not self.hit_bottom:
+            self.hit_top, self.hit_bottom = False, True
+            # print("playing sound")
+            self.hit_sound.play()
+            self.cur_vel[1] *= -1            
 
         if self.rect.left <= 0:
-            pygame.event.post(pygame.event.Event(REACHEDBORDER, is_left=True))
+            pygame.event.post(pygame.event.Event(REACHED_BORDER_EVENT, is_left=True))
         elif self.rect.right >= SCREEN_WIDTH:
-            pygame.event.post(pygame.event.Event(REACHEDBORDER, is_left=False))
+            pygame.event.post(pygame.event.Event(REACHED_BORDER_EVENT, is_left=False))
     
 
     def handle_player(self, players):
@@ -44,10 +64,10 @@ class Ball(pygame.sprite.Sprite):
             if self.rect.colliderect(player.rect):
                 self.cur_vel = [self.cur_vel[0] * -1, self.cur_vel[1]]
                 if player.is_left:
-                    self.pos[0] = player.rect.right + RADIUS
+                    self.pos[0] = player.rect.right + BALL_RADIUS
                 else:
-                    self.pos[0] = player.rect.left - RADIUS
-                print("player collision")
+                    self.pos[0] = player.rect.left - BALL_RADIUS
+                self.hit_sound.play()
 
 
     def move(self, dt, players):

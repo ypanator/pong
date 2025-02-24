@@ -3,7 +3,7 @@ from pygame.locals import (
     K_w, K_s, K_d, K_UP, K_DOWN, K_LEFT
 )
 from constants import (
-    SCREEN_HEIGHT, SCREEN_WIDTH, PLAYERFIRE, PLAYER_OFFSET
+    SCREEN_HEIGHT, SCREEN_WIDTH, PLAYER_FIRE_EVENT, PLAYER_OFFSET
 )
 
 class Player(pygame.sprite.Sprite):
@@ -31,14 +31,14 @@ class Player(pygame.sprite.Sprite):
             if pressed_keys[K_s]:
                 self.pos[1] += 5 * dt
             if pressed_keys[K_d]:
-                pygame.event.post(pygame.event.Event(PLAYERFIRE, is_left=self.is_left))
+                pygame.event.post(pygame.event.Event(PLAYER_FIRE_EVENT, is_left=self.is_left))
         else:
             if pressed_keys[K_UP]:
                 self.pos[1] -= 5 * dt
             if pressed_keys[K_DOWN]:
                 self.pos[1] += 5 * dt
             if pressed_keys[K_LEFT]:
-                pygame.event.post(pygame.event.Event(PLAYERFIRE, is_left=self.is_left))
+                pygame.event.post(pygame.event.Event(PLAYER_FIRE_EVENT, is_left=self.is_left))
 
         self.rect.move_ip(0, self.pos[1] - self.rect.centery)
         self.pos[1] = max(self.pos[1], self.HEIGHT / 2)
