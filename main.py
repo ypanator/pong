@@ -6,10 +6,12 @@ from pygame.locals import (
 from player import Player
 from score import Score
 from ball import Ball
-from constants import (
-    SCREEN_HEIGHT, SCREEN_WIDTH, PLAYER_FIRE_EVENT, REACHED_BORDER_EVENT, SFX_VOLUME
-)
+from middle_line import MiddleLine
 
+from constants import (
+    SCREEN_HEIGHT, SCREEN_WIDTH, PLAYER_FIRE_EVENT, REACHED_BORDER_EVENT,
+    SFX_VOLUME, LINE_HEIGHT, LINE_WIDTH, LINE_GAP, LINE_OFFSET
+)
 
 pygame.init()
 pygame.display.set_caption("pong")
@@ -24,10 +26,11 @@ player_left = Player(True)
 player_right = Player(False)
 score_left = Score(True)
 score_right = Score(False)
+middle_line = MiddleLine()
 
 drawables = pygame.sprite.Group()
 players = pygame.sprite.Group()
-drawables.add(player_left, player_right, ball, score_left, score_right)
+drawables.add(player_left, player_right, ball, score_left, score_right, middle_line)
 players.add(player_left, player_right)
 
 clock = pygame.time.Clock()

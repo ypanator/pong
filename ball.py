@@ -43,13 +43,11 @@ class Ball(pygame.sprite.Sprite):
     def handle_border(self):
         if self.rect.top <= 0 and not self.hit_top:
             self.hit_top, self.hit_bottom = True, False
-            # print("playing sound")
             self.hit_sound.play()
             self.cur_vel[1] *= -1
         
         if self.rect.bottom >= SCREEN_HEIGHT and not self.hit_bottom:
             self.hit_top, self.hit_bottom = False, True
-            # print("playing sound")
             self.hit_sound.play()
             self.cur_vel[1] *= -1            
 

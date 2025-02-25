@@ -13,6 +13,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self, is_left):
         super().__init__()
+        
         self.surf = pygame.Surface((self.WIDTH, self.HEIGHT))
         self.surf.fill("white")
         self.is_left = is_left
