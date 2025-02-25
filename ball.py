@@ -10,8 +10,8 @@ class Ball(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.hit_sound = pygame.mixer.Sound("audio\hit.wav")
-        self.launch_sound = pygame.mixer.Sound("audio\launch.wav")
+        self.hit_sound = pygame.mixer.Sound("audio\\hit.wav")
+        self.launch_sound = pygame.mixer.Sound("audio\\launch.wav")
         self.hit_sound.set_volume(SFX_VOLUME)
         self.launch_sound.set_volume(SFX_VOLUME)
 
@@ -38,7 +38,7 @@ class Ball(pygame.sprite.Sprite):
             self.cur_vel = BALL_VEL
         else:
             self.cur_vel = [-BALL_VEL[0], BALL_VEL[1]]
-        
+        self.hit_bottom, self.hit_top = False, False
 
     def handle_border(self):
         if self.rect.top <= 0 and not self.hit_top:
