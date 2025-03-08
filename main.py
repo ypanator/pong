@@ -9,8 +9,7 @@ from ball import Ball
 from middle_line import MiddleLine
 
 from constants import (
-    SCREEN_HEIGHT, SCREEN_WIDTH, PLAYER_FIRE_EVENT, REACHED_BORDER_EVENT,
-    SFX_VOLUME, LINE_HEIGHT, LINE_WIDTH, LINE_GAP, LINE_OFFSET
+    SCREEN_HEIGHT, SCREEN_WIDTH, PLAYER_FIRE_EVENT, REACHED_BORDER_EVENT, SFX_VOLUME
 )
 
 pygame.init()
