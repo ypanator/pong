@@ -3,18 +3,15 @@ from pygame.locals import (
     K_w, K_s, K_d, K_UP, K_DOWN, K_LEFT
 )
 from constants import (
-    SCREEN_HEIGHT, SCREEN_WIDTH, PLAYER_FIRE_EVENT, PLAYER_OFFSET
+    SCREEN_HEIGHT, SCREEN_WIDTH, PLAYER_FIRE_EVENT, PLAYER_OFFSET, PLAYER_WIDTH, PLAYER_HEIGHT
 )
 
 class Player(pygame.sprite.Sprite):
-    OFFSET = PLAYER_OFFSET
-    WIDTH, HEIGHT = 7, SCREEN_HEIGHT // 4
-
 
     def __init__(self, is_left):
         super().__init__()
         
-        self.surf = pygame.Surface((self.WIDTH, self.HEIGHT))
+        self.surf = pygame.Surface((PLAYER_WIDTH, PLAYER_HEIGHT))
         self.surf.fill("white")
         self.is_left = is_left
         self.pos = [
@@ -42,7 +39,7 @@ class Player(pygame.sprite.Sprite):
                 pygame.event.post(pygame.event.Event(PLAYER_FIRE_EVENT, is_left=self.is_left))
 
         self.rect.move_ip(0, self.pos[1] - self.rect.centery)
-        self.pos[1] = max(self.pos[1], self.HEIGHT / 2)
-        self.pos[1] = min(self.pos[1], SCREEN_HEIGHT - self.HEIGHT / 2)
+        self.pos[1] = max(self.pos[1], PLAYER_HEIGHT / 2)
+        self.pos[1] = min(self.pos[1], SCREEN_HEIGHT - PLAYER_HEIGHT / 2)
         self.rect.top = max(0, self.rect.top)
         self.rect.bottom = min(SCREEN_HEIGHT, self.rect.bottom)
