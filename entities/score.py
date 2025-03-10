@@ -1,11 +1,11 @@
 import pygame
 from constants import (
-    SCORE_OFFSETS, SCREEN_WIDTH, FONT_SIZE
+    SCORE_OFFSETS, SCREEN_WIDTH, SCORE_FONT_SIZE
 )
 
 class Score(pygame.sprite.Sprite):
     pygame.font.init()
-    font = pygame.font.Font("retro_font.ttf", FONT_SIZE)
+    font = pygame.font.Font("retro_font.ttf", SCORE_FONT_SIZE)
 
     def render(self, score):
         return self.font.render(str(score), False, "white", "black")
