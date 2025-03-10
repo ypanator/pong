@@ -34,47 +34,43 @@ class GameScene:
         self.clock = pygame.time.Clock()
 
         self.is_rolling = False
-        self.run = True
 
-    def start(self, data, scene_manager):
-        while self.run and scene_manager.run:
+    def iterate(self, scene_manager):
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key in (K_q, K_ESCAPE):
+                    scene_manager.close()
+            
+            if event.type == QUIT:
+                scene_manager.close()
+            
+            if (
+                not self.is_rolling and event.type == PLAYER_FIRE_EVENT and 
+                event.is_left == self.ball.is_left
+            ):
+                self.ball.launch()
+                self.is_rolling = True
 
-            for event in pygame.event.get():
-                if event.type == KEYDOWN:
-                    if event.key in (K_q, K_ESCAPE):
-                        self.run = False
-                        scene_manager.run = False
-                
-                if event.type == QUIT:
-                    self.run = False
-                
-                if (
-                    not self.is_rolling and event.type == PLAYER_FIRE_EVENT and 
-                    event.is_left == self.ball.is_left
-                ):
-                    self.ball.launch()
-                    self.is_rolling = True
+            if event.type == REACHED_BORDER_EVENT:
+                self.reachedborder_sound.play()
+                if event.is_left: 
+                    self.player_right.score += 1
+                    self.score_right.update(self.player_right.score)
+                else: 
+                    self.player_left.score += 1
+                    self.score_left.update(self.player_left.score)
 
-                if event.type == REACHED_BORDER_EVENT:
-                    self.reachedborder_sound.play()
-                    if event.is_left: 
-                        self.player_right.score += 1
-                        self.score_right.update(self.player_right.score)
-                    else: 
-                        self.player_left.score += 1
-                        self.score_left.update(self.player_left.score)
+                self.ball.reset(event.is_left)
+                self.is_rolling = False
 
-                    self.ball.reset(event.is_left)
-                    self.is_rolling = False
-
-            dt = self.clock.tick() / 1000 * 60
-            self.players.update(pygame.key.get_pressed(), dt)
-            self.ball.update(dt, self.is_rolling, 
-                self.player_left.pos if self.ball.is_left else self.player_right.pos, self.players
-            )
-                
-            self.screen.fill("black")
-            for ent in self.drawables:
-                self.screen.blit(ent.surf, ent.rect)
-                
-            pygame.display.flip()
+        dt = self.clock.tick() / 1000 * 60
+        self.players.update(pygame.key.get_pressed(), dt)
+        self.ball.update(dt, self.is_rolling, 
+            self.player_left.pos if self.ball.is_left else self.player_right.pos, self.players
+        )
+            
+        self.screen.fill("black")
+        for ent in self.drawables:
+            self.screen.blit(ent.surf, ent.rect)
+            
+        pygame.display.flip()

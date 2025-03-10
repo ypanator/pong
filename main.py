@@ -11,7 +11,7 @@ pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 scenes = {
     "GameScene": GameScene
 }
-scene_manager = SceneManager(scenes)
-scene_manager.start("GameScene", None)
+scene_manager = SceneManager(scenes, "GameScene")
+scene_manager.start()
 
 pygame.quit()

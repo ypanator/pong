@@ -1,22 +1,39 @@
 class SceneManager:
 
     # scenes = {scene_name: scene_constructor}
-    def __init__(self, scenes):
-        self.scenes_classes = scenes
-        self.scenes_objects = {}
+    def __init__(self, scenes, first_scene):
+        self.scene_classes = scenes
+        self.scene_objects = {}
+
+        self.current_scene = first_scene
+        self.next_scene = first_scene
+
+        self.context = {}
         self.run = True
     
-    def start(self, scene, data):
-        if scene not in self.scenes_classes:
-            raise ValueError(f"Scene '{scene}' does not exist.")
+    def start(self):
+        if self.current_scene not in self.scene_classes:
+            raise ValueError(f"Scene '{self.current_scene}' does not exist.")
         
-        if self.scenes_objects.get(scene) is None:
-            self.scenes_objects[scene] = self.scenes_classes[scene]()
+        while self.run:
 
-        self.scenes_objects[scene].start(data, self)
+            self.current_scene = self.next_scene
+
+            if self.current_scene not in self.scene_objects:
+                self.scene_objects[self.current_scene] = self.scene_classes[self.current_scene]()
+            scene_object = self.scene_objects[self.current_scene]
+
+            while self.current_scene == self.next_scene and self.run:
+                scene_object.iterate(self)
     
     def restart_scene(self, scene):
-        if scene not in self.scenes_classes:
+        if scene not in self.scene_classes:
             raise ValueError(f"Scene '{scene}' does not exist.")
         
-        self.scenes_objects[scene] = self.scenes_classes[scene]()
+        self.scene_objects[scene] = self.scene_classes[scene]()
+    
+    def change_scene(self, scene):
+        self.next_scene = scene
+    
+    def close(self):
+        self.run = False
