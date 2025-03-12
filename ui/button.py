@@ -5,9 +5,14 @@ from constants import (
 
 class Button:
 
-    def __init__(self, x, y, width, height, thickness, text):
-        self.active_button = self._create_button(BUTTON_ACCENT_ACTIVE, x, y, width, height, thickness, text)
-        self.inactive_button = self._create_button(BUTTON_ACCENT_INACTIVE, x, y, width, height, thickness, text)
+    def __init__(self, x, y, width, height, thickness, text, action):
+        self._is_active = False
+        self._action = action
+
+        self._active_button = self._create_button(BUTTON_ACCENT_ACTIVE, x, y, width, height, thickness, text)
+        self._inactive_button = self._create_button(BUTTON_ACCENT_INACTIVE, x, y, width, height, thickness, text)
+
+        self.surf, self.rect = self._inactive_button
 
     def _create_button(self, accent, x, y, width, height, thickness, text):
         border_surf = pygame.Surface((width, height))
@@ -27,8 +32,21 @@ class Button:
 
         return (border_surf, border_rect)
 
-    def get_inactive_button(self):
-        return self.inactive_button
+    def _set_active(self):
+        if not self.is_active:
+            self._is_active = True
+            self.surf, _ = self._active_button
     
-    def get_active_button(self):
-        return self.active_button
+    def _set_inactive(self):
+        if self.is_active:
+            self._is_active = False
+            self.surf, _ = self._inactive_button
+
+    def update(self, events):
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(event.pos):
+                self._set_active()
+            if event.type == pygame.MOUSEBUTTONUP:
+                if self.rect.collidepoint(event.pos):
+                    self._action()
+                self._set_inactive()
