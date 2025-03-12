@@ -33,17 +33,19 @@ class Button:
         return (border_surf, border_rect)
 
     def _set_active(self):
-        if not self.is_active:
+        if not self._is_active:
             self._is_active = True
             self.surf, _ = self._active_button
     
     def _set_inactive(self):
-        if self.is_active:
+        if self._is_active:
             self._is_active = False
             self.surf, _ = self._inactive_button
 
     def update(self, events):
         for event in events:
+            if getattr(event, "button", -1) != 1:
+                continue
             if event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(event.pos):
                 self._set_active()
             if event.type == pygame.MOUSEBUTTONUP:
