@@ -14,7 +14,7 @@ class MainMenuScene:
         self.scene_manager = scene_manager
 
         title_surf = pygame.font.Font("retro_font.ttf", TITLE_FONT_SIZE).render("PONG", False, "white", "black")
-        title_rect = self.title_surf.get_rect(center = (SCREEN_WIDTH // 2, MAIN_MENU_OFFSET + self.title_surf.get_height() // 2))
+        title_rect = title_surf.get_rect(center = (SCREEN_WIDTH // 2, MAIN_MENU_OFFSET + title_surf.get_height() // 2))
         self.title = namedtuple("title", ["surf", "rect"])(title_surf, title_rect)
 
         self.local_play_button = Button(
@@ -23,7 +23,7 @@ class MainMenuScene:
             "local play", lambda: scene_manager.change_scene("LocalGameScene"))
         
         self.multiplayer_button = Button(
-            SCREEN_WIDTH // 2, self.local_play_button.bottom + MAIN_MENU_OFFSET + MAIN_MENU_BUTTON_HEIGHT // 2, 
+            SCREEN_WIDTH // 2, self.local_play_button.rect.bottom + MAIN_MENU_OFFSET + MAIN_MENU_BUTTON_HEIGHT // 2, 
             MAIN_MENU_BUTTON_WIDTH, MAIN_MENU_BUTTON_HEIGHT, MAIN_MENU_BUTTON_BORDER, 
             "multiplayer", lambda: scene_manager.change_scene("MultiplayerMenuScene"))
 
