@@ -6,8 +6,9 @@ from constants import (
 
 class TextField:
 
-    def __init__(self, x, y, width, height, thickness):
+    def __init__(self, x, y, width, height, thickness, limit):
         self._text = []
+        self._limit = limit
         pygame.time.set_timer(CURSOR_BLINK_EVENT, CURSOR_BLINK_DELAY)
 
         self._base = self._get_base(x, y, width, height, thickness)
@@ -47,14 +48,14 @@ class TextField:
     def update(self, events):
         changed = False
         for event in events:
-            if event.type == CURSOR_BLINK_EVENT:
+            if event.type == CURSOR_BLINK_EVENT :
                 self._is_visible = not self._is_visible
                 changed = True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE and self._text:
                     self._text.pop()
                     changed = True
-                elif event.unicode:
+                elif event.unicode and len(self._text) < self._limit:
                     self._text.append(event.unicode)
                     changed = True
         if changed:
