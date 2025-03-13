@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import (
-    K_q, K_ESCAPE, KEYDOWN, QUIT,
+    K_q, K_ESCAPE, KEYDOWN, QUIT
 )
 
 from entities.player import Player
@@ -12,8 +12,10 @@ from constants import (
     PLAYER_FIRE_EVENT, REACHED_BORDER_EVENT, SFX_VOLUME
 )
 
-class GameScene:
-    def __init__(self):
+class LocalGameScene:
+    def __init__(self, scene_manager):
+        self.scene_manager = scene_manager
+
         self.screen = pygame.display.get_surface()
 
         self.reachedborder_sound = pygame.mixer.Sound("audio\\reachedborder.wav")
@@ -35,14 +37,14 @@ class GameScene:
 
         self.is_rolling = False
 
-    def iterate(self, scene_manager):
+    def iterate(self):
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 if event.key in (K_q, K_ESCAPE):
-                    scene_manager.close()
+                    self.scene_manager.close()
             
             if event.type == QUIT:
-                scene_manager.close()
+                self.scene_manager.close()
             
             if (
                 not self.is_rolling and event.type == PLAYER_FIRE_EVENT and 
