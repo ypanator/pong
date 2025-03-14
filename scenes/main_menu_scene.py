@@ -20,12 +20,14 @@ class MainMenuScene:
         self.local_play_button = Button(
             SCREEN_WIDTH // 2, self.title.rect.bottom + MAIN_MENU_OFFSET + MAIN_MENU_BUTTON_HEIGHT // 2, 
             MAIN_MENU_BUTTON_WIDTH, MAIN_MENU_BUTTON_HEIGHT, MAIN_MENU_BUTTON_BORDER, 
-            "local play", lambda: scene_manager.change_scene("LocalGameScene"))
+            "local play", lambda: scene_manager.change_scene("LocalGameScene")
+        )
         
         self.multiplayer_button = Button(
             SCREEN_WIDTH // 2, self.local_play_button.rect.bottom + MAIN_MENU_OFFSET + MAIN_MENU_BUTTON_HEIGHT // 2, 
             MAIN_MENU_BUTTON_WIDTH, MAIN_MENU_BUTTON_HEIGHT, MAIN_MENU_BUTTON_BORDER, 
-            "multiplayer", lambda: scene_manager.change_scene("MultiplayerMenuScene"))
+            "multiplayer", lambda: scene_manager.change_scene("MultiplayerMenuScene")
+        )
 
         self.screen = pygame.display.get_surface()
         self.drawables = [self.title, self.local_play_button, self.multiplayer_button]
