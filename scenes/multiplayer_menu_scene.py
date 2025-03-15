@@ -19,18 +19,11 @@ class MultiplayerMenuScene:
         self._button_border = 10
         self._font_size = 30
 
-        self._lpanel_offset_x = SCREEN_WIDTH / 3
+        self._lpanel_offset_x = SCREEN_WIDTH / 4 - 10
         self._lpanel_offset_y = SCREEN_HEIGHT / 3
 
-        self._rpanel_offset_x = SCREEN_WIDTH * 2 / 3
-        self._rpanel_offset_y = SCREEN_HEIGHT  / 4
-
-
-        #
-        # TODO: 
-        #       - update button for font size
-        #       - update textfield to hold text from left instead of from center
-        #
+        self._rpanel_offset_x = SCREEN_WIDTH * 3 / 4 - 10
+        self._rpanel_offset_y = SCREEN_HEIGHT / 4
 
 
         # ---------------------- left panel ----------------------
@@ -43,14 +36,13 @@ class MultiplayerMenuScene:
         self._back_button = Button(
             self._lpanel_offset_x, self._create_room_button.rect.centery + self._lpanel_offset_y, 
             self._button_width, self._button_height, self._button_border, 
-            "back", lambda: print("test 2")
+            "back", lambda: self._scene_manager.change_scene("MainMenuScene")
         )
-        
+
         # ---------------------- right panel ----------------------
         self._label_surf = pygame.font.Font("retro_font.ttf", self._font_size).render("ENTER ROOM CODE", False, "white", "black")
-        self._label_rect = self._label_surf.get_rect(center = (self._rpanel_offset_x, self._rpanel_offset_y))
-        # TODO:
-        self.label = namedtuple("label", ["surf", "rect"])(self._label_surf, self._label_rect)
+        self._label_rect = self._label_surf.get_rect(center = (self._rpanel_offset_x, self._rpanel_offset_y * 2 / 3))
+        self._label = namedtuple("label", ["surf", "rect"])(self._label_surf, self._label_rect)
 
         self._room_code_field = TextField(
             self._rpanel_offset_x, self._label_rect.centery + self._rpanel_offset_y, 
@@ -58,29 +50,36 @@ class MultiplayerMenuScene:
         )
 
         self._join_button = Button(
-            self._rpanel_offset_x, self._room_code_field.rect.centery + self._lpanel_offset_y, 
+            self._rpanel_offset_x, self._room_code_field.rect.bottom + self._rpanel_offset_y, 
             self._button_width, self._button_height, self._button_border, 
-            "back", lambda: print("test 3")
+            "join", lambda: print(self._room_code_field.get_text())
         )
 
-        # TODO:
-        self._drawables = None
-        self._updatable = None
+
+        self._drawables = [
+            self._create_room_button, self._back_button, self._label,
+            self._room_code_field, self._join_button
+        ]
+        self._updatable = [
+            self._create_room_button, self._back_button,
+            self._room_code_field, self._join_button            
+        ]
     
-    def iterate(self):
+    def iterate(self, tick):
         events = pygame.event.get()
         for event in events:
             if event.type == KEYDOWN:
                 if event.key in (K_q, K_ESCAPE):
-                    self.scene_manager.close()
+                    self._scene_manager.close()
             
             if event.type == QUIT:
-                self.scene_manager.close()
+                self._scene_manager.close()
 
-        self.multiplayer_button.update(events)
-        self.local_play_button.update(events)
+        for ent in self._updatable:
+            ent.update(events)
 
-        for ent in self.drawables:
-            self.screen.blit(ent.surf, ent.rect)
+        self._screen.fill("black")
+        for ent in self._drawables:
+            self._screen.blit(ent.surf, ent.rect)
 
         pygame.display.flip()

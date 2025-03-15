@@ -49,6 +49,6 @@ class Button:
             if event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(event.pos):
                 self._set_active()
             if event.type == pygame.MOUSEBUTTONUP:
-                if self.rect.collidepoint(event.pos):
+                if self.rect.collidepoint(event.pos) and self._is_active:
                     self._action()
                 self._set_inactive()

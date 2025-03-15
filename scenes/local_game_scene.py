@@ -33,15 +33,13 @@ class LocalGameScene:
         self.drawables.add(self.player_left, self.player_right, self.ball, self.score_left, self.score_right, self.middle_line)
         self.players.add(self.player_left, self.player_right)
 
-        self.clock = pygame.time.Clock()
-
         self.is_rolling = False
 
-    def iterate(self):
+    def iterate(self, tick):
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 if event.key in (K_q, K_ESCAPE):
-                    self.scene_manager.close()
+                    self.scene_manager.change_scene("MainMenuScene")
             
             if event.type == QUIT:
                 self.scene_manager.close()
@@ -65,7 +63,7 @@ class LocalGameScene:
                 self.ball.reset(event.is_left)
                 self.is_rolling = False
 
-        dt = self.clock.tick() / 1000 * 60
+        dt = tick / 1000 * 60
         self.players.update(pygame.key.get_pressed(), dt)
         self.ball.update(dt, self.is_rolling, 
             self.player_left.pos if self.ball.is_left else self.player_right.pos, self.players

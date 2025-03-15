@@ -32,7 +32,7 @@ class MainMenuScene:
         self.screen = pygame.display.get_surface()
         self.drawables = [self.title, self.local_play_button, self.multiplayer_button]
 
-    def iterate(self):
+    def iterate(self, tick):
         events = pygame.event.get()
         for event in events:
             if event.type == KEYDOWN:
@@ -45,6 +45,7 @@ class MainMenuScene:
         self.multiplayer_button.update(events)
         self.local_play_button.update(events)
 
+        self.screen.fill("black")
         for ent in self.drawables:
             self.screen.blit(ent.surf, ent.rect)
 

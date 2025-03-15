@@ -1,3 +1,5 @@
+import pygame
+
 class SceneManager:
 
     # scenes = {scene_name: scene_constructor}
@@ -10,6 +12,8 @@ class SceneManager:
 
         self.context = {}
         self.run = True
+
+        self.clock = pygame.time.Clock()
     
     def start(self):
         while self.run:
@@ -24,7 +28,7 @@ class SceneManager:
             scene_object = self.scene_objects[self.current_scene]
 
             while self.current_scene == self.next_scene and self.run:
-                scene_object.iterate()
+                scene_object.iterate(self.clock.tick())
     
     def restart_scene(self, scene):
         if scene not in self.scene_classes:
