@@ -4,40 +4,40 @@ class SceneManager:
 
     # scenes = {scene_name: scene_constructor}
     def __init__(self, scenes, first_scene):
-        self.scene_classes = scenes
-        self.scene_objects = {}
+        self._scene_classes = scenes
+        self._scene_objects = {}
 
-        self.current_scene = first_scene
-        self.next_scene = first_scene
+        self._current_scene = first_scene
+        self._next_scene = first_scene
 
         self.context = {}
-        self.run = True
+        self._run = True
 
-        self.clock = pygame.time.Clock()
+        self._clock = pygame.time.Clock()
     
     def start(self):
-        while self.run:
+        while self._run:
 
-            self.current_scene = self.next_scene
+            self._current_scene = self._next_scene
 
-            if self.current_scene not in self.scene_classes:
-                raise ValueError(f"Scene '{self.current_scene}' does not exist.")
+            if self._current_scene not in self._scene_classes:
+                raise ValueError(f"Scene '{self._current_scene}' does not exist.")
         
-            if self.current_scene not in self.scene_objects:
-                self.scene_objects[self.current_scene] = self.scene_classes[self.current_scene](self)
-            scene_object = self.scene_objects[self.current_scene]
+            if self._current_scene not in self._scene_objects:
+                self._scene_objects[self._current_scene] = self._scene_classes[self._current_scene](self)
+            scene_object = self._scene_objects[self._current_scene]
 
-            while self.current_scene == self.next_scene and self.run:
-                scene_object.iterate(self.clock.tick())
+            while self._current_scene == self._next_scene and self._run:
+                scene_object.iterate(self._clock.tick())
     
     def restart_scene(self, scene):
-        if scene not in self.scene_classes:
+        if scene not in self._scene_classes:
             raise ValueError(f"Scene '{scene}' does not exist.")
         
-        self.scene_objects[scene] = self.scene_classes[scene](self)
+        self._scene_objects[scene] = self._scene_classes[scene](self)
     
     def change_scene(self, scene):
-        self.next_scene = scene
+        self._next_scene = scene
     
     def close(self):
-        self.run = False
+        self._run = False

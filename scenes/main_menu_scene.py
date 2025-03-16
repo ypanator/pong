@@ -15,22 +15,22 @@ class MainMenuScene:
 
         title_surf = pygame.font.Font("retro_font.ttf", TITLE_FONT_SIZE).render("PONG", False, "white", "black")
         title_rect = title_surf.get_rect(center = (SCREEN_WIDTH // 2, MAIN_MENU_OFFSET + title_surf.get_height() // 2))
-        self.title = namedtuple("title", ["surf", "rect"])(title_surf, title_rect)
+        self._title = namedtuple("title", ["surf", "rect"])(title_surf, title_rect)
 
-        self.local_play_button = Button(
-            SCREEN_WIDTH // 2, self.title.rect.bottom + MAIN_MENU_OFFSET + MAIN_MENU_BUTTON_HEIGHT // 2, 
+        self._local_play_button = Button(
+            SCREEN_WIDTH // 2, self._title.rect.bottom + MAIN_MENU_OFFSET + MAIN_MENU_BUTTON_HEIGHT // 2, 
             MAIN_MENU_BUTTON_WIDTH, MAIN_MENU_BUTTON_HEIGHT, MAIN_MENU_BUTTON_BORDER, 
             "local play", lambda: scene_manager.change_scene("LocalGameScene")
         )
         
-        self.multiplayer_button = Button(
-            SCREEN_WIDTH // 2, self.local_play_button.rect.bottom + MAIN_MENU_OFFSET + MAIN_MENU_BUTTON_HEIGHT // 2, 
+        self._multiplayer_button = Button(
+            SCREEN_WIDTH // 2, self._local_play_button.rect.bottom + MAIN_MENU_OFFSET + MAIN_MENU_BUTTON_HEIGHT // 2, 
             MAIN_MENU_BUTTON_WIDTH, MAIN_MENU_BUTTON_HEIGHT, MAIN_MENU_BUTTON_BORDER, 
             "multiplayer", lambda: scene_manager.change_scene("MultiplayerMenuScene")
         )
 
-        self.screen = pygame.display.get_surface()
-        self.drawables = [self.title, self.local_play_button, self.multiplayer_button]
+        self._screen = pygame.display.get_surface()
+        self._drawables = [self._title, self._local_play_button, self._multiplayer_button]
 
     def iterate(self, tick):
         events = pygame.event.get()
@@ -42,11 +42,11 @@ class MainMenuScene:
             if event.type == QUIT:
                 self.scene_manager.close()
 
-        self.multiplayer_button.update(events)
-        self.local_play_button.update(events)
+        self._multiplayer_button.update(events)
+        self._local_play_button.update(events)
 
-        self.screen.fill("black")
-        for ent in self.drawables:
-            self.screen.blit(ent.surf, ent.rect)
+        self._screen.fill("black")
+        for ent in self._drawables:
+            self._screen.blit(ent.surf, ent.rect)
 
         pygame.display.flip()
