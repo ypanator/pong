@@ -10,7 +10,7 @@ class Client:
         self._loop = None
         self._thread = None
         self._host = "127.0.0.1"
-        self._port = "8888"
+        self._port = 8888
         self._writer = None
         self._reader = None
         self._connected = False
