@@ -1,0 +1,13 @@
+# server response
+ERROR = 0
+ROOM_JOIN = 1
+ROOM_CREATE = 2
+POS_UPDATE = 3
+POS_SEND = 4
+ROOM_CODE = 5
+
+# client requests
+JOIN_REQ = 6
+CREATE_REQ = 7
+SEND_POS_REQ = 8
+GET_CODE_REQ = 9

@@ -4,7 +4,7 @@ from ui.button import Button
 from ui.text_field import TextField
 from collections import namedtuple
 from net.client import Client
-
+import net.server_code as codes
 from pygame.locals import (
     K_q, K_ESCAPE, KEYDOWN, QUIT
 )
@@ -86,16 +86,28 @@ class MultiplayerMenuScene:
 
         pygame.display.flip()
     
+    def _start_game(self):
+        self._client.write({"type": codes.GET_CODE_REQ, "data": None})
+        while (response := self._client.read()) is None or response["type"] != codes.ROOM_CODE:
+            pass
+        self._scene_manager.context["mp_game"] = { "room": response["data"] }
+        self._scene_manager.change_scene("MultiplayerGameScene")
+
     def _create_room_event(self):
         self._ensure_connection()
-        self._client.write({"type": "create", "data": None})
+        self._client.write({ "type": codes.CREATE_REQ, "data": None })
         self._scene_manager.context["loading"] = {
-            "wait": lambda: (response := self._client.read()) is None or response["type"] != "ok",
-            "on_load": lambda: self._scene_manager.change_scene("MultiplayerGameScene")
+            "wait": lambda: (response := self._client.read()) is None or response["type"] != codes.ROOM_CREATE,
+            "on_load": lambda: self._start_game()
         }
 
-    def _join_room_event(code):
-        pass
+    def _join_room_event(self, code):
+        self._ensure_connection()
+        self._client.write({ "type": codes.JOIN_REQ, "data": code })
+        self._scene_manager.context["loading"] = {
+            "wait": lambda: (response := self._client.read()) is None or response["type"] != codes.ROOM_JOIN,
+            "on_load": lambda: self._start_game()
+        }
 
     def _ensure_connection(self):
         if self._client is None:
