@@ -3,6 +3,7 @@ from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from ui.button import Button
 from ui.text_field import TextField
 from collections import namedtuple
+from net.client import Client
 
 from pygame.locals import (
     K_q, K_ESCAPE, KEYDOWN, QUIT
@@ -25,12 +26,13 @@ class MultiplayerMenuScene:
         self._rpanel_offset_x = SCREEN_WIDTH * 3 / 4 - 10
         self._rpanel_offset_y = SCREEN_HEIGHT / 4
 
+        self._client = None
 
         # ---------------------- left panel ----------------------
         self._create_room_button = Button(
             self._lpanel_offset_x, self._lpanel_offset_y, 
             self._button_width, self._button_height, self._button_border, 
-            "create room", lambda: print("test 1")
+            "create room", self._create_room_event
         )
 
         self._back_button = Button(
@@ -52,7 +54,7 @@ class MultiplayerMenuScene:
         self._join_button = Button(
             self._rpanel_offset_x, self._room_code_field.rect.bottom + self._rpanel_offset_y, 
             self._button_width, self._button_height, self._button_border, 
-            "join", lambda: print(self._room_code_field.get_text())
+            "join", lambda: self._join_room_event(self._room_code_field.get_text())
         )
 
 
@@ -83,3 +85,19 @@ class MultiplayerMenuScene:
             self._screen.blit(ent.surf, ent.rect)
 
         pygame.display.flip()
+    
+    def _create_room_event(self):
+        self._ensure_connection()
+        self._client.write({"type": "create", "data": None})
+        self._scene_manager.context["loading"] = {
+            "wait": lambda: (response := self._client.read()) is None or response["type"] != "ok",
+            "on_load": lambda: self._scene_manager.change_scene("MultiplayerGameScene")
+        }
+
+    def _join_room_event(code):
+        pass
+
+    def _ensure_connection(self):
+        if self._client is None:
+            self._client = Client()
+            self._client.connect()

@@ -69,6 +69,9 @@ async def handle_msg(msg, state, writer):
                 await write(wrt, "pos", pos)
             
             await write(writer, "ok", f"Position sent: {pos[0]} {pos[1]}")
+        
+        case "get":
+            await write(writer, "get", state.room)
 
         case _:
             await write(writer, "error", "Incorrect type provided.")
@@ -78,7 +81,7 @@ async def main():
     server = await asyncio.start_server(handle_client, "127.0.0.1", 8888)
     async with server:
         await server.serve_forever()
-        
+
 class State:
     def __init__(self):
         self.room = None
