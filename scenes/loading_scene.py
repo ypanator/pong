@@ -22,7 +22,7 @@ class LoadingScene:
         self._state = self.LOADING
 
         self._timestamp = pygame.time.get_ticks()
-        self._time_window = 20 * 1000
+        self._time_window = 10 * 1000
         self._timestep = 1000
 
         self._continue = self._get("continue")
@@ -53,6 +53,11 @@ class LoadingScene:
 
     def iterate(self, ticks):
         print(self._state)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self._scene_manager.close()
+
         if self._state == self.LOADING:
 
             if pygame.time.get_ticks() - self._timestamp > self._time_window:
@@ -63,18 +68,12 @@ class LoadingScene:
                 self.logger.info("Succesfuly loaded.")
                 self._on_load()
                 return
-            else:
-                pass
-                pygame.time.wait(self._timestep)
 
         if self._state == self.ERROR:
             if pygame.time.get_ticks() - self._timestamp > self._time_window:
                 self._previous_scene()
                 self.logger.info("Returning due to an error")
                 return
-            else:
-                pass
-                pygame.time.wait(self._timestep)
 
         # if self._changed:
         self._surf = self._font.render(self._info, False, "white", "black")

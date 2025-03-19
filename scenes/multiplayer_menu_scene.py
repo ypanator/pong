@@ -102,6 +102,7 @@ class MultiplayerMenuScene:
             "on_load": lambda: self._start_game(),
             "previous_scene": lambda: self._scene_manager.change_scene("MultiplayerMenuScene")
         }
+        self._scene_manager.restart_scene("LoadingScene")
         self._scene_manager.change_scene("LoadingScene")
 
     def _join_room_event(self, code):
@@ -112,6 +113,7 @@ class MultiplayerMenuScene:
             "on_load": lambda: self._start_game(),
             "previous_scene": lambda: self._scene_manager.change_scene("MultiplayerMenuScene")
         }
+        self._scene_manager.restart_scene("LoadingScene")
         self._scene_manager.change_scene("LoadingScene")
 
     def _ensure_connection(self):
@@ -119,5 +121,4 @@ class MultiplayerMenuScene:
             if "net" not in self._scene_manager.context or "client" not in self._scene_manager.context["net"]:
                 self._scene_manager.context["net"] = {"client": Client()}
             self._client = self._scene_manager.context["net"]["client"]
-            if not self._client.connect():
-                raise ConnectionError("Failed to connect to server")
+            self._client.connect()
