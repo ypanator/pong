@@ -111,5 +111,7 @@ class MultiplayerMenuScene:
 
     def _ensure_connection(self):
         if self._client is None:
-            self._client = Client()
+            if "net" not in self._scene_manager.context or "client" not in self._scene_manager.context["net"]:
+                self._scene_manager.context["net"] = {"client": Client()}
+            self._client = self._scene_manager.context["net"]["client"]
             self._client.connect()
