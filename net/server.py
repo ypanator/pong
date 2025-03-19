@@ -2,12 +2,16 @@ import asyncio
 import json
 import random
 import string
-import net.server_code as codes
+import server_code as codes
 
 rooms = {} # room_id: writers
 rooms_lock = asyncio.Lock()
 
 async def handle_client(reader, writer):
+
+    addr = writer.get_extra_info('peername')
+    print(f"Connection from {addr}")
+
     state = State()
     tasks = []
 
@@ -17,6 +21,7 @@ async def handle_client(reader, writer):
             if not msg:
                 break
             msg = json.loads(msg.decode())
+            print(f"Received: {msg}")
 
             tasks.append(asyncio.create_task(handle_msg(msg, state, writer)))
 
@@ -86,6 +91,7 @@ async def handle_msg(msg, state, writer):
 
 async def main():
     server = await asyncio.start_server(handle_client, "127.0.0.1", 8888)
+    print("Successfuly started serving on 127.0.0.1:8888")
     async with server:
         await server.serve_forever()
 

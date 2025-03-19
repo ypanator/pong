@@ -90,6 +90,7 @@ class MultiplayerMenuScene:
         self._client.write({"type": codes.GET_CODE_REQ, "data": None})
         while (response := self._client.read()) is None or response["type"] != codes.ROOM_CODE:
             pass
+            pygame.time.wait(100)
         self._scene_manager.context["mp_game"] = { "room": response["data"] }
         self._scene_manager.change_scene("MultiplayerGameScene")
 
@@ -97,21 +98,26 @@ class MultiplayerMenuScene:
         self._ensure_connection()
         self._client.write({ "type": codes.CREATE_REQ, "data": None })
         self._scene_manager.context["loading"] = {
-            "wait": lambda: (response := self._client.read()) is None or response["type"] != codes.ROOM_CREATE,
-            "on_load": lambda: self._start_game()
+            "continue": lambda: (response := self._client.read()) is not None and response["type"] == codes.ROOM_CREATE,
+            "on_load": lambda: self._start_game(),
+            "previous_scene": lambda: self._scene_manager.change_scene("MultiplayerMenuScene")
         }
+        self._scene_manager.change_scene("LoadingScene")
 
     def _join_room_event(self, code):
         self._ensure_connection()
         self._client.write({ "type": codes.JOIN_REQ, "data": code })
         self._scene_manager.context["loading"] = {
-            "wait": lambda: (response := self._client.read()) is None or response["type"] != codes.ROOM_JOIN,
-            "on_load": lambda: self._start_game()
+            "continue": lambda: (response := self._client.read()) is not None and response["type"] == codes.ROOM_JOIN,
+            "on_load": lambda: self._start_game(),
+            "previous_scene": lambda: self._scene_manager.change_scene("MultiplayerMenuScene")
         }
+        self._scene_manager.change_scene("LoadingScene")
 
     def _ensure_connection(self):
-        if self._client is None:
+        if self._client is None or not self._client.connected:
             if "net" not in self._scene_manager.context or "client" not in self._scene_manager.context["net"]:
                 self._scene_manager.context["net"] = {"client": Client()}
             self._client = self._scene_manager.context["net"]["client"]
-            self._client.connect()
+            if not self._client.connect():
+                raise ConnectionError("Failed to connect to server")

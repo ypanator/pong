@@ -5,10 +5,11 @@ from scenes.scene_manager import SceneManager
 from scenes.local_game_scene import LocalGameScene
 from scenes.main_menu_scene import MainMenuScene
 from scenes.multiplayer_menu_scene import MultiplayerMenuScene
+from scenes.loading_scene import LoadingScene
 
 import logging
 import os
-import datetime
+from datetime import datetime
 
 # ================ logger setup ================
 log_dir = os.path.join(os.path.expanduser("~"), "pong_logs")
@@ -30,13 +31,14 @@ pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 scenes = {
     "LocalGameScene": LocalGameScene,
     "MainMenuScene": MainMenuScene,
-    "MultiplayerMenuScene": MultiplayerMenuScene
+    "MultiplayerMenuScene": MultiplayerMenuScene,
+    "LoadingScene": LoadingScene
 }
 scene_manager = SceneManager(scenes, "MainMenuScene")
 
 try:
     scene_manager.start()
-except Exception:
-    logging.exception()
+except Exception as e:
+    logging.exception(e)
 
 pygame.quit()

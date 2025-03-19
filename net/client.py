@@ -4,6 +4,8 @@ import socket
 import threading
 import json
 
+import pygame
+
 class Client:
 
     def __init__(self):
@@ -13,12 +15,23 @@ class Client:
         self._port = 8888
         self._writer = None
         self._reader = None
-        self._connected = False
+        self.connected = False
         self._msg_queue = Queue()
     
     def connect(self):
+        if self.connected:
+            return True
+            
         self._thread = threading.Thread(target=self._start_event_loop, daemon=True)
         self._thread.start()
+        
+        # Wait for connection with timeout
+        start_time = pygame.time.get_ticks()
+        while not self.connected:
+            if pygame.time.get_ticks() - start_time > 5000:  # 5 second timeout
+                return False
+            pygame.time.wait(100)  # Small delay to prevent CPU spinning
+        return True
     
     def _start_event_loop(self):
         self._loop = asyncio.new_event_loop()
@@ -28,7 +41,7 @@ class Client:
     async def _async_connect(self):
         try:
             self._reader, self._writer = await asyncio.open_connection(self._host, self._port)
-            self._connected = True
+            self.connected = True
             await self._receive_loop()
         except (ConnectionRefusedError, socket.error) as e:
             print(f"Connection error: {e}")
@@ -38,7 +51,7 @@ class Client:
             while True:
                 data = await self._reader.readline()
                 if not data:
-                    self._connected = False
+                    self.connected = False
                     break
                 self._msg_queue.put(json.loads(data.decode()))
         except asyncio.CancelledError as e:
@@ -56,14 +69,14 @@ class Client:
         await self._writer.wait_closed()
     
     def close(self):
-        if self._connected:
+        if self.connected:
             asyncio.run_coroutine_threadsafe(self._async_close(), self._loop)
             if self._thread and self._thread.is_alive():
                 self._thread.join()
-            self._connected = False
+            self.connected = False
 
     def write(self, message):
-        if self._connected:
+        if self.connected:
             asyncio.run_coroutine_threadsafe(self._async_write(message), self._loop)
     
     def read(self):

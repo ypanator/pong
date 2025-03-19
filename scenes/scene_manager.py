@@ -1,4 +1,5 @@
 import pygame
+import logging
 
 class SceneManager:
 
@@ -10,11 +11,11 @@ class SceneManager:
         self._current_scene = first_scene
         self._next_scene = first_scene
 
-        self.context = {}
+        self._clock = pygame.time.Clock()
+
+        self.context = {"clock": self._clock}
         self._run = True
 
-        self._clock = pygame.time.Clock()
-    
     def start(self):
         while self._run:
 
