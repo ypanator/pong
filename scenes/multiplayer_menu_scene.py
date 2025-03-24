@@ -3,7 +3,7 @@ from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from ui.button import Button
 from ui.text_field import TextField
 from collections import namedtuple
-from net.client import Client
+from net.client.client import Client
 import net.server_code as codes
 from pygame.locals import (
     K_q, K_ESCAPE, KEYDOWN, QUIT
