@@ -61,4 +61,3 @@ class RoomsManager:
     @_locked
     async def get_writers(self, room_code):
         return self._rooms[room_code]["writers"]
-    

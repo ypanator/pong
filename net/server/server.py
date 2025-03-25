@@ -118,12 +118,11 @@ async def broadcast_game(writers, game):
 def room_init(code):
     pass
 
-async def generate_code():
-    async with rooms_lock:
-        while True:
-            code = ''.join(random.choices(string.ascii_lowercase, k=5))
-            if code not in rooms:
-                rooms[code] = dict()
-                return code
+def generate_code():
+    prefix = list(str(time.perf_counter_ns() % 1000))
+    suffix = random.sample(string.ascii_lowercase, 3)
+    code = prefix + suffix
+    random.shuffle(code)
+    return "".join(code)
 
 asyncio.run(main())

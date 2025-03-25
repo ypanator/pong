@@ -7,7 +7,7 @@ class ClientState:
     def in_room(self):
         return self.room_code is not None and self.game is not None
     
-    def join_room(self, code, rooms):
+    def join_room(self, code):
         self.room_code = code
         self.game = self.room_ref["game"]
     
