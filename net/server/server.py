@@ -4,16 +4,16 @@ import random
 import string
 import net.server.server_codes as server_codes
 import time
-from state import State
+from net.server.client_state import ClientState
 from rooms_manager import RoomsManager
 
-rooms = RoomsManager()
+rooms_manager = RoomsManager()
 
 async def handle_client(reader, writer):
 
     print(f"Connection from {writer.get_extra_info('peername')}")
 
-    state = State()
+    state = ClientState()
     tasks = []
 
     timestamp = 0
@@ -30,7 +30,7 @@ async def handle_client(reader, writer):
             tasks.append(asyncio.create_task(handle_msg(msg, state, writer)))
 
             # lets assume only the first client broadcasts state to avoid double broadcasting
-            if state.in_room and writer == state.room_ref["writers"][0]:
+            if state.in_room and writer == rooms_manager.is_broadcaster(state.room_code, writer):
                 if time.monotonic() - timestamp >= timestep:
                     timestamp = time.monotonic()
                     tasks.append(asyncio.create_task(broadcast_game(state.room_ref["writers"], state.game)))
