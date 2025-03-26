@@ -6,7 +6,17 @@ class OnlineGame:
         self.state = {
 
         }
-        # player_id: {"is_controlling": paddle, "inputs": input_list}
+        
+        """
+        player_id: {
+            "is_controlling": paddle, 
+            "inputs": {
+                "UP": bool, 
+                "DOWN": bool, 
+                "FIRE": bool
+            }
+        }
+        """
         self.players = {
 
         }
