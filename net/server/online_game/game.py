@@ -35,46 +35,45 @@ class OnlineGame:
         }
         self._players = {}
 
-        self.state_lock = asyncio.Lock()
-        self._player_locks = {}
-        self._paddles_lock = asyncio.Lock()
-
         self._running = False
 
         # TODO: initalize game stuffs
         self._player_left = Player(True)
         self._player_right = Player(False)
         self._ball = Ball()
-    
-    def _get_player_lock(self, id):
-        if id not in self._player_locks:
-            self._player_locks[id] = asyncio.Lock()
-        return self._player_locks[id]
+        self._paddles = set(self._player_left, self._player_right)
 
-    async def add_player(self, id):
-        async with self._get_player_lock(id):
-            self._players[id] = {
-                "is_controlling": self._assign_paddle(), 
-                "inputs": {
-                    "UP": False,
-                    "DOWN": False, 
-                    "FIRE": False
-                }
+    def add_player(self, id):
+        self._players[id] = {
+            "is_controlling": self._assign_paddle(), 
+            "inputs": {
+                "UP": False,
+                "DOWN": False, 
+                "FIRE": False
             }
+        }
 
-    async def remove_player(self, id):
-        async with self._get_player_lock(id):
-            if id in self._players:
-                del self._players[id]
+    def remove_player(self, id):
+        if id in self._players:
+            del self._players[id]
 
-    def _assign_paddle():
+    def _assign_paddle(self):
+        if self._paddles:
+            return self._paddles.pop()
+
+    def _unassign_paddle(self, paddle):
+        self._paddles.add(paddle)
+
+    async def start(self):
+        while True:
+            await self._iterate()
+
+    async def _iterate(self):
         pass
-
-    def _unassign_paddle():
-        pass
-
-    def _iterate(self):
-        pass
-
-    def start():
-        pass # TODO: iterate in a loop
+    """
+    time = clock.tick() - time_slept
+    dt = time / 1000 * 60
+    update(dt)
+    time_slept = max(0, 1 / 60 * 1000 - time)
+    asyncio.sleep(time_slept)
+    """
