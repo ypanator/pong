@@ -1,61 +1,30 @@
-import asyncio
-from entities import Ball, Player
-
-"""
-================= self.state =================
-"paddles": list({
-    "is_left": bool
-    "x": int, "y": int 
-})
-"ball": {
-    "x": int, "y": int,
-    "xv": int, "yv": int,
-    "vel": int
-}
-
-================= self.players =================
-player_id: {
-    "is_controlling": paddle, 
-    "inputs": {
-        "UP": bool, 
-        "DOWN": bool, 
-        "FIRE": bool
-    }
-}
-"""
+from entities import Ball, Paddle
+from models import GameState, PlayerState, Event
 
 class OnlineGame:
 
     def __init__(self):
-        self.state = {
-            "paddles": list(),
-            "ball": {
-                "x": -1, "y": -1, "xv": -1, "yv": -1, "vel": -1
-            }
-        }
+        self.state = GameState()
         self._players = {}
 
         self._running = False
 
-        self._player_left = Player(True)
-        self._player_right = Player(False)
+        self._player_left = Paddle(True)
+        self._player_right = Paddle(False)
         self._ball = Ball()
         self._paddles = set(self._player_left, self._player_right)
 
-
+        self._paddle_fire_event = Event()
+        self._reached_border_event = Event()
 
     def add_player(self, id):
-        self._players[id] = {
-            "is_controlling": self._assign_paddle(), 
-            "inputs": {
-                "UP": False,
-                "DOWN": False, 
-                "FIRE": False
-            }
-        }
+        if id not in self._players:
+            self._players[id] = PlayerState(is_controlling=self._assign_paddle)
 
     def remove_player(self, id):
         if id in self._players:
+            paddle = self._players[id]
+            self._unassign_paddle(paddle)
             del self._players[id]
 
     def _assign_paddle(self):
