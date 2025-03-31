@@ -3,7 +3,7 @@ import random
 import math
 from constants import (
     SCREEN_HEIGHT, SCREEN_WIDTH, REACHED_BORDER_EVENT, BALL_OFFSET, BALL_ACCELERATION,
-    BALL_RADIUS, BALL_VELOCITY, SFX_VOLUME, BALL_PIXELS, BALL_ANGLE, PLAYER_HEIGHT, MIN_ANGLE_FACTOR
+    BALL_RADIUS, BALL_VELOCITY, SFX_VOLUME, BALL_PIXELS, BALL_ANGLE, PADDLE_HEIGHT, MIN_ANGLE_FACTOR
 )
 
 class Ball(pygame.sprite.Sprite):
@@ -65,7 +65,7 @@ class Ball(pygame.sprite.Sprite):
     def handle_player(self, players):
         for player in players:
             if self.rect.colliderect(player.rect):
-                factor = (self._pos[1] - player.rect.centery) / (PLAYER_HEIGHT / 2)
+                factor = (self._pos[1] - player.rect.centery) / (PADDLE_HEIGHT / 2)
                 factor = math.copysign(max(MIN_ANGLE_FACTOR, abs(factor)), factor)
                 angle = factor * BALL_ANGLE
                 self._vel += BALL_ACCELERATION

@@ -1,8 +1,5 @@
 import pygame
-import os
 import logging
-import datetime
-import time
 
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 

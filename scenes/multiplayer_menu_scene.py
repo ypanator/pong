@@ -4,7 +4,7 @@ from ui.button import Button
 from ui.text_field import TextField
 from collections import namedtuple
 from net.client.client import Client
-import net.server_code as codes
+import net.server.server_codes as codes
 from pygame.locals import (
     K_q, K_ESCAPE, KEYDOWN, QUIT
 )

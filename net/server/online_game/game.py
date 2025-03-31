@@ -3,7 +3,7 @@ from entities import Ball, Player
 
 """
 ================= self.state =================
-"players": list({
+"paddles": list({
     "is_left": bool
     "x": int, "y": int 
 })
@@ -28,7 +28,7 @@ class OnlineGame:
 
     def __init__(self):
         self.state = {
-            "players": list(),
+            "paddles": list(),
             "ball": {
                 "x": -1, "y": -1, "xv": -1, "yv": -1, "vel": -1
             }
@@ -37,11 +37,12 @@ class OnlineGame:
 
         self._running = False
 
-        # TODO: initalize game stuffs
         self._player_left = Player(True)
         self._player_right = Player(False)
         self._ball = Ball()
         self._paddles = set(self._player_left, self._player_right)
+
+
 
     def add_player(self, id):
         self._players[id] = {

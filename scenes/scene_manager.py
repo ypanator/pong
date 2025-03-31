@@ -1,5 +1,4 @@
 import pygame
-import logging
 
 class SceneManager:
 

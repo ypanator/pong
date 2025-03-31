@@ -2,7 +2,7 @@ import pygame
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 
 from scenes.scene_manager import SceneManager
-from scenes.local_game_scene import LocalGameScene
+from scenes.local_game.local_game_scene import LocalGameScene
 from scenes.main_menu_scene import MainMenuScene
 from scenes.multiplayer_menu_scene import MultiplayerMenuScene
 from scenes.loading_scene import LoadingScene

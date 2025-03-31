@@ -3,7 +3,7 @@ import random
 import math
 
 from constants import (
-    SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_HEIGHT, BALL_ACCELERATION,
+    SCREEN_WIDTH, SCREEN_HEIGHT, PADDLE_HEIGHT, BALL_ACCELERATION,
     BALL_OFFSET, BALL_RADIUS, BALL_ANGLE, MIN_ANGLE_FACTOR, BALL_VELOCITY, REACHED_BORDER_EVENT
 )
 
@@ -52,7 +52,7 @@ class Ball:
     def handle_player(self, players):
         for player in players:
             if self.rect.colliderect(player._rect):
-                factor = (self._pos[1] - player._rect.centery) / (PLAYER_HEIGHT / 2)
+                factor = (self._pos[1] - player._rect.centery) / (PADDLE_HEIGHT / 2)
                 factor = math.copysign(max(MIN_ANGLE_FACTOR, abs(factor)), factor)
                 angle = factor * BALL_ANGLE
                 self._vel += BALL_ACCELERATION
