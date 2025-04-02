@@ -18,6 +18,7 @@ class Paddle:
         self.rect.center = center
 
         self._paddle_fire_event = event
+        self.score = 0
 
 
     def update(self, pressed, dt):

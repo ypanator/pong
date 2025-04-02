@@ -11,6 +11,7 @@ class Ball:
     def __init__(self, event):
         self._is_left = random.choice([True, False])
         self.vel = self.xv = self.yv = 0
+        self.is_rolling = False
 
         center = (
             BALL_OFFSET if self._is_left else SCREEN_WIDTH - BALL_OFFSET,
@@ -30,6 +31,8 @@ class Ball:
         self.xv = math.cos(angle) * self.vel
         self.xv *= 1 if self._is_left else -1
         self.yv = math.sin(angle) * self.vel
+
+        self.is_rolling = True
 
 
     def handle_border(self):
@@ -87,8 +90,8 @@ class Ball:
         self.rect.center = (x, y)
         
 
-    def update(self, dt, is_rolling, player_pos, players):
-        self.move(dt, players) if is_rolling else self.follow_player(player_pos)
+    def update(self, dt, player_pos, players):
+        self.move(dt, players) if self.is_rolling else self.follow_player(player_pos)
 
 
     def reset(self, is_left):
@@ -97,3 +100,4 @@ class Ball:
             BALL_OFFSET if self._is_left else SCREEN_WIDTH - BALL_OFFSET,
             SCREEN_HEIGHT // 2            
         )
+        self.is_rolling = False

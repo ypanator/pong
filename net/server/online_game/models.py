@@ -9,9 +9,12 @@ class GameState:
     class PaddleState:
         is_left: bool
         x: int = -1; y: int = -1
+        score: int = 0
     
     @dataclass
     class BallState:
+        is_left: bool = False
+        is_rolling: bool = False
         x: int = -1; y: int = -1
         xv: int = -1; yv: int = -1
         vel: int = -1
@@ -24,12 +27,16 @@ class GameState:
         state = self.paddles[0]
         state.x = paddle_left.rect.centerx
         state.y = paddle_left.rect.centery
+        state.score = paddle_left.score
 
         state = self.paddles[1]
         state.x = paddle_right.rect.centerx
         state.y = paddle_right.rect.centery
+        state.score = paddle_right.score
 
         state = self.ball
+        state.is_left = ball.is_left
+        state.is_rolling = ball.is_rolling
         state.x = ball.rect.centerx
         state.y = ball.rect.centery
         state.xv = ball.xv
@@ -48,7 +55,7 @@ class PlayerState:
         down: bool = False
         fire: bool = False
     
-    is_controlling: Paddle
+    is_controlling: Paddle = None
     inputs: Inputs = Inputs()
 
 
