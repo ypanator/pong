@@ -29,11 +29,10 @@ async def handle_client(reader, writer):
 
             tasks.append(asyncio.create_task(handle_msg(msg, state, writer)))
 
-            # lets assume only the first client broadcasts state to avoid double broadcasting
-            if state.in_room and writer == rooms_manager.is_broadcaster(state.room_code, writer):
-                if time.monotonic() - timestamp >= timestep:
+            if state.in_room() and rooms_manager.is_broadcaster(state.room_code, writer):
+                if time.monotonic() - timestamp >= timestep and state.game_state.is_updated:
                     timestamp = time.monotonic()
-                    tasks.append(asyncio.create_task(broadcast_game(state.room_ref["writers"], state.game)))
+                    tasks.append(asyncio.create_task(broadcast_game(state.writers, state.game_state)))
 
         await asyncio.gather(*tasks)
 
@@ -44,8 +43,8 @@ async def handle_client(reader, writer):
         code = state.leave_room()
 
         # if the last client left the room, delete it
-        if code is not None and not rooms[code]["writers"]:
-            del rooms[state.room_code]
+        if code is not None and rooms_manager.is_empty(code):
+            rooms_manager.remove_room(code)
 
         writer.close()
         await writer.wait_closed()
@@ -61,13 +60,13 @@ async def handle_msg(msg, state, writer):
         if not isinstance(code, str) or len(code) != 5 or not code.isalpha():
             await write(writer, server_codes.ERROR, "Incorrect room code.")
             return
-        if code not in rooms:
+        if not rooms_manager.exists(code):
             await write(writer, server_codes.ERROR, "Room does not exist.")
             return
         if rooms[]
         
         code = code.lower()
-        state.room = code
+        state.join_room()
         rooms[code].add(writer)
 
         await write(writer, server_codes.ROOM_JOIN, f"Joined room: {code}")
@@ -119,10 +118,6 @@ def room_init(code):
     pass
 
 def generate_code():
-    prefix = list(str(time.perf_counter_ns() % 1000))
-    suffix = random.sample(string.ascii_lowercase, 3)
-    code = prefix + suffix
-    random.shuffle(code)
-    return "".join(code)
+    return "".join(random.sample(string.ascii_lowercase, k=6))
 
 asyncio.run(main())

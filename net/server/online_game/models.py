@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from .entities.paddle import Paddle
 
 
@@ -20,8 +20,9 @@ class GameState:
         vel: int = -1
     
     is_updated: bool = False
-    paddles: list[PaddleState] = [PaddleState(is_left=True), PaddleState(is_left=False)]
-    ball: BallState = BallState()
+    paddles: list[PaddleState] = (
+        field(default_factory = lambda: [GameState.PaddleState(is_left=True), GameState.PaddleState(is_left=False)]))
+    ball: BallState = field(default_factory=BallState)
 
     def update(self, paddle_left, paddle_right, ball):
         state = self.paddles[0]
@@ -56,7 +57,7 @@ class PlayerState:
         fire: bool = False
     
     is_controlling: Paddle = None
-    inputs: Inputs = Inputs()
+    inputs: Inputs = field(default_factory=Inputs)
 
 
 @dataclass
