@@ -1,6 +1,5 @@
-from dataclasses import dataclass
-
-@dataclass
-class Message:
-    type: int
-    data: any
+def Message(type, data):
+    return {
+        "type": type,
+        "data": data
+    }
