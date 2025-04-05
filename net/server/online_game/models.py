@@ -2,72 +2,82 @@ from dataclasses import dataclass, field
 from .entities.paddle import Paddle
 
 
-@dataclass(frozen=True)
-class GameState:
+def PaddleState(is_left):
+    return {
+        'is_left': is_left,
+        'x': -1,
+        'y': -1,
+        'score': 0
+    }
 
-    @dataclass
-    class PaddleState:
-        is_left: bool
-        x: int = -1; y: int = -1
-        score: int = 0
-    
-    @dataclass
-    class BallState:
-        is_left: bool = False
-        is_rolling: bool = False
-        x: int = -1; y: int = -1
-        xv: int = -1; yv: int = -1
-        vel: int = -1
-    
-    is_updated: bool = False
-    paddles: list[PaddleState] = (
-        field(default_factory = lambda: [GameState.PaddleState(is_left=True), GameState.PaddleState(is_left=False)]))
-    ball: BallState = field(default_factory=BallState)
+def BallState():
+    return {
+        'is_left': False,
+        'is_rolling': False,
+        'x': -1,
+        'y': -1,
+        'xv': -1,
+        'yv': -1,
+        'vel': -1
+    }
 
-    def update(self, paddle_left, paddle_right, ball):
-        state = self.paddles[0]
-        state.x = paddle_left.rect.centerx
-        state.y = paddle_left.rect.centery
-        state.score = paddle_left.score
+def GameState():
+    return {
+        'is_updated': False,
+        'paddles': [
+            PaddleState(False),
+            PaddleState(True)
+        ],
+        'ball': BallState()
+    }
 
-        state = self.paddles[1]
-        state.x = paddle_right.rect.centerx
-        state.y = paddle_right.rect.centery
-        state.score = paddle_right.score
+def Inputs():
+    return {
+        'up': False,
+        'down': False,
+        'fire': False
+    }
 
-        state = self.ball
-        state.is_left = ball.is_left
-        state.is_rolling = ball.is_rolling
-        state.x = ball.rect.centerx
-        state.y = ball.rect.centery
-        state.xv = ball.xv
-        state.yv = ball.yv
-        state.vel = ball.vel
+def PlayerState():
+    return {
+        'is_controlling': None,
+        'inputs': Inputs()
+    }
 
-        self.is_updated = True
+def Event():
+    return {
+        'is_active': False,
+        'is_left': False
+    }
 
+def update_game_state(state, paddle_left, paddle_right, ball):
+    paddle_state = state['paddles'][0]
+    paddle_state['x'] = paddle_left.rect.centerx
+    paddle_state['y'] = paddle_left.rect.centery
+    paddle_state['score'] = paddle_left.score
 
-@dataclass
-class PlayerState:
-    
-    @dataclass
-    class Inputs:
-        up: bool = False
-        down: bool = False
-        fire: bool = False
-    
-    is_controlling: Paddle = None
-    inputs: Inputs = field(default_factory=Inputs)
+    paddle_state = state['paddles'][1]
+    paddle_state['x'] = paddle_right.rect.centerx
+    paddle_state['y'] = paddle_right.rect.centery
+    paddle_state['score'] = paddle_right.score
 
+    ball_state = state['ball']
+    ball_state['is_left'] = ball.is_left
+    ball_state['is_rolling'] = ball.is_rolling
+    ball_state['x'] = ball.rect.centerx
+    ball_state['y'] = ball.rect.centery
+    ball_state['xv'] = ball.xv
+    ball_state['yv'] = ball.yv
+    ball_state['vel'] = ball.vel
 
-@dataclass
-class Event:
-    is_active: bool = False
-    is_left: bool = False
+    state['is_updated'] = True
+    return state
 
-    def enable(self, is_left):
-        self.is_active = True
-        self.is_left = is_left
-    
-    def disable(self):
-        self.is_active = False
+def enable_event(event, is_left):
+    event['is_active'] = True
+    event['is_left'] = is_left
+    return event
+
+def disable_event(event):
+    event['is_active'] = False
+    return event
