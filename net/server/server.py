@@ -16,8 +16,8 @@ async def handle_client(reader, writer):
     state = ClientState()
     tasks = []
 
-    timestamp = 0
-    timestep = 50
+    broadcaster_timestamp = 0
+    broadcaster_timestep = 50
 
     try:
         while True:
@@ -30,9 +30,9 @@ async def handle_client(reader, writer):
             tasks.append(asyncio.create_task(handle_msg(msg, state, writer)))
 
             if state.in_room() and rooms_manager.is_broadcaster(state.room_code, writer):
-                if time.monotonic() - timestamp >= timestep and state.game_state.is_updated:
-                    timestamp = time.monotonic()
-                    tasks.append(asyncio.create_task(broadcast_game(state.writers, state.game_state)))
+                if time.monotonic() - broadcaster_timestamp >= broadcaster_timestep and state.game_state.is_updated:
+                    broadcaster_timestamp = time.monotonic()
+                    tasks.append(asyncio.create_task(broadcast_state(state.writers, state.game_state)))
 
         await asyncio.gather(*tasks)
 
@@ -56,46 +56,56 @@ async def handle_msg(msg, state, writer):
 
     type = msg["type"]
     if type == server_codes.JOIN_REQ:
-        code = msg["data"]
-        if not isinstance(code, str) or len(code) != 5 or not code.isalpha():
+        room_code = msg["data"]
+        if state.in_room():
+            await write(writer, server_codes.ERROR, "User already in room.")
+            return            
+        if not isinstance(room_code, str) or len(room_code) != 6 or not room_code.isalpha() and room_code.islower():
             await write(writer, server_codes.ERROR, "Incorrect room code.")
             return
-        if not rooms_manager.exists(code):
+        if not rooms_manager.exists(room_code):
             await write(writer, server_codes.ERROR, "Room does not exist.")
             return
-        if rooms[]
-        
-        code = code.lower()
-        state.join_room()
-        rooms[code].add(writer)
+        if rooms_manager.is_full(room_code):
+            await write(writer, server_codes.ERROR, "Room is full.")
+            return
+                
+        state.join_room(room_code, rooms_manager)
+        rooms_manager.join_room(room_code, writer)
 
-        await write(writer, server_codes.ROOM_JOIN, f"Joined room: {code}")
+        await write(writer, server_codes.ROOM_JOINED, f"Joined room: {room_code}")
 
     elif type == server_codes.CREATE_REQ:
-        code = await generate_code()
-        room_init(code)
-        rooms[code] = {writer}
-        state.room = code
+        if state.in_room():
+            await write(writer, server_codes.ERROR, "User already in room.")
+            return  
+        room_code = generate_code()
+        await rooms_manager.room_init(room_code)
+        rooms_manager.join_room(room_code, writer)
+        state.join_room(room_code, rooms_manager)
 
-        await write(writer, server_codes.ROOM_CREATE, f"Created and joined room: {code}")
+        await write(writer, server_codes.ROOM_CREATE, f"Created and joined room: {room_code}")
 
-    elif type == server_codes.SEND_POS_REQ:
-        pos = msg["data"]
-        if not isinstance(pos, list) or len(pos) != 2 or not isinstance(pos[0], int) or not isinstance(pos[1], int):
+    elif type == server_codes.NEW_INPUTS:
+        inputs = msg["data"]
+        if (
+            not isinstance(inputs, dict) or "up" not in inputs or "down" not in inputs or "fire" not in inputs or
+            not isinstance(inputs["up"], bool) or not isinstance(inputs["down"], bool) or not isinstance(inputs["fire"], bool)
+        ):
             await write(writer, server_codes.ERROR, "Incorrect position format.")
             return
-        if state.room is None:
-            await write(writer, server_codes.ERROR, "Not connected to a room.")
+        if not state.in_room():
+            await write(writer, server_codes.ERROR, "User is not connected to a room.")
             return
-        for wrt in rooms[state.room]:
-            if wrt == writer:
-                continue
-            await write(wrt, server_codes.POS_UPDATE, pos)
+
+        # TODO: update player inputs in respective game in room
+        pass
         
-        await write(writer, server_codes.POS_SEND, f"Position sent: {pos[0]} {pos[1]}")
+        await write(writer, server_codes.POS_SEND, f"Position received.")
     
-    elif type == server_codes.GET_CODE_REQ:
-        await write(writer, server_codes.ROOM_CODE, state.room)
+    elif type == server_codes.LEAVE_REQ:
+        # TODO: implement leaving the room logic
+        pass
 
     else:
         await write(writer, server_codes.ERROR, "Incorrect type provided.")
@@ -111,13 +121,11 @@ async def write(writer, type, data):
     writer.write((json.dumps({"type": type, "data": data}) + "\n").encode())
     await writer.drain()
 
-async def broadcast_game(writers, game):
-    pass # TODO:
-
-def room_init(code):
-    pass
+async def broadcast_state(writers, state):
+    for writer in writers:
+        await write(writer, server_codes.NEW_STATE, state)
 
 def generate_code():
-    return "".join(random.sample(string.ascii_lowercase, k=6))
+    return "".join(random.choices(string.ascii_lowercase, k=6))
 
 asyncio.run(main())

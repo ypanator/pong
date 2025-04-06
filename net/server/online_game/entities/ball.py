@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+from models import enable_event
 
 from constants import (
     SCREEN_WIDTH, SCREEN_HEIGHT, PADDLE_HEIGHT, BALL_ACCELERATION,
@@ -49,9 +50,9 @@ class Ball:
             self.rect.center = (x, y)    
 
         if self.rect.left <= 0:
-            self._reached_border_event.enable(True)
+            enable_event(self._reached_border_event, True)
         elif self.rect.right >= SCREEN_WIDTH:
-            self._reached_border_event.enable(False)
+            enable_event(self._reached_border_event, False)
 
 
     def handle_player(self, players):

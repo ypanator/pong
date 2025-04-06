@@ -38,9 +38,9 @@ def Inputs():
         'fire': False
     }
 
-def PlayerState():
+def PlayerState(is_controlling):
     return {
-        'is_controlling': None,
+        'is_controlling': is_controlling,
         'inputs': Inputs()
     }
 
@@ -71,13 +71,10 @@ def update_game_state(state, paddle_left, paddle_right, ball):
     ball_state['vel'] = ball.vel
 
     state['is_updated'] = True
-    return state
 
 def enable_event(event, is_left):
     event['is_active'] = True
     event['is_left'] = is_left
-    return event
 
 def disable_event(event):
     event['is_active'] = False
-    return event
