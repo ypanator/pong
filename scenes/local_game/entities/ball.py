@@ -71,10 +71,10 @@ class Ball(pygame.sprite.Sprite):
                 self._vel += BALL_ACCELERATION
 
                 self._xv = math.cos(angle) * self._vel
-                self._xv *= 1 if player.is_left else -1
+                self._xv *= 1 if player._is_left else -1
                 self._yv = math.sin(angle) * self._vel
 
-                if player.is_left:
+                if player._is_left:
                     self._pos[0] = player.rect.right + BALL_RADIUS + 1
                 else:
                     self._pos[0] = player.rect.left - BALL_RADIUS - 1

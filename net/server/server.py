@@ -70,8 +70,7 @@ async def handle_msg(msg, state, writer):
             await write(writer, server_codes.ERROR, "Room is full.")
             return
                 
-        state.join_room(room_code, rooms_manager)
-        rooms_manager.join_room(room_code, writer)
+        join_room(room_code, rooms_manager, writer, state)
 
         await write(writer, server_codes.ROOM_JOINED, f"Joined room: {room_code}")
 
@@ -81,8 +80,8 @@ async def handle_msg(msg, state, writer):
             return  
         room_code = generate_code()
         await rooms_manager.room_init(room_code)
-        rooms_manager.join_room(room_code, writer)
-        state.join_room(room_code, rooms_manager)
+        
+        join_room(room_code, rooms_manager, writer, state)
 
         await write(writer, server_codes.ROOM_CREATE, f"Created and joined room: {room_code}")
 
@@ -98,14 +97,15 @@ async def handle_msg(msg, state, writer):
             await write(writer, server_codes.ERROR, "User is not connected to a room.")
             return
 
-        # TODO: update player inputs in respective game in room
-        pass
+        state.game_coro.players[id(writer)]["inputs"] = inputs
         
         await write(writer, server_codes.POS_SEND, f"Position received.")
     
     elif type == server_codes.LEAVE_REQ:
-        # TODO: implement leaving the room logic
-        pass
+        if not state.in_room():
+            await write(writer, server_codes.ERROR, "User is not connected to a room.")
+            return
+        leave_room(room_code, rooms_manager, writer, state)
 
     else:
         await write(writer, server_codes.ERROR, "Incorrect type provided.")
@@ -124,6 +124,16 @@ async def write(writer, type, data):
 async def broadcast_state(writers, state):
     for writer in writers:
         await write(writer, server_codes.NEW_STATE, state)
+
+def join_room(room_code, rooms_manager, writer, state):
+    rooms_manager.join_room(room_code, writer)
+    state.join_room(room_code, rooms_manager)
+    state.game_coro.add_player(id(writer))
+
+def leave_room(room_code, rooms_manager, writer, state):
+    rooms_manager.leave_room(room_code, writer)
+    state.leave_room()
+    state.game_coro.remove_player(id(writer))
 
 def generate_code():
     return "".join(random.choices(string.ascii_lowercase, k=6))

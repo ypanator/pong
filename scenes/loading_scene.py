@@ -49,7 +49,6 @@ class LoadingScene:
         self.logger.exception(error)
 
     def iterate(self, ticks):
-        print(self._state)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
