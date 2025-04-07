@@ -3,8 +3,9 @@ from queue import Queue
 import socket
 import threading
 import json
-
 import pygame
+from net.server.msg_model import Message
+import net.server.server_codes as codes
 
 class Client:
 
@@ -28,9 +29,9 @@ class Client:
         # Wait for connection with timeout
         start_time = pygame.time.get_ticks()
         while not self.connected:
-            if pygame.time.get_ticks() - start_time > 5000:  # 5 second timeout
+            if pygame.time.get_ticks() - start_time > 5000:
                 return False
-            pygame.time.wait(100)  # Small delay to prevent CPU spinning
+            pygame.time.wait(100)
         return True
     
     def _start_event_loop(self):
@@ -83,3 +84,15 @@ class Client:
         if not self._msg_queue.empty():
             return self._msg_queue.get_nowait()
         return None
+    
+    def join_room_req(self, room_code):
+        self.write(Message(codes.JOIN_REQ, room_code))
+
+    def create_room_req(self):
+        self.write(Message(codes.CREATE_REQ, None))
+
+    def send_new_inputs(self, inputs):
+        self.write(Message(codes.NEW_INPUTS, inputs))
+
+    def leave_room_req(self):
+        self.write(Message(codes.LEAVE_REQ, None))
