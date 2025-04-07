@@ -53,7 +53,7 @@ class LoadingScene:
             self._handle_error(Exception(f"Could not load the \"{func}()\" method from global context."))
 
     def _handle_error(self, error):
-        if self._state == self.LOADING:
+        if self._state != self.ERROR:
             self._state = self.ERROR
             self._changed = True
             self._success_timestamp = pygame.time.get_ticks()
@@ -76,6 +76,7 @@ class LoadingScene:
                 if self._client.connected:
                     self._on_start()
                     self._state = self.AWAIT_SUCCESS
+                    self._success_timestamp = pygame.time.get_ticks()
                     return
                 self._connecting_try_timestamp = pygame.time.get_ticks()
                 self._client.connect()
@@ -87,7 +88,7 @@ class LoadingScene:
                 return
             
             if self._success():
-                self.logger.info("Succesfuly loaded.")
+                self.logger.info("Succesfully loaded.")
                 self._on_success()
                 return
 
