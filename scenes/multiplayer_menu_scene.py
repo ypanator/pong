@@ -26,7 +26,6 @@ class MultiplayerMenuScene:
         self._rpanel_offset_x = SCREEN_WIDTH * 3 / 4 - 10
         self._rpanel_offset_y = SCREEN_HEIGHT / 4
 
-        self._client = None
 
         # ---------------------- left panel ----------------------
         self._create_room_button = Button(
@@ -85,40 +84,24 @@ class MultiplayerMenuScene:
             self._screen.blit(ent.surf, ent.rect)
 
         pygame.display.flip()
-    
-    def _start_game(self):
-        self._client.write({"type": codes.GET_CODE_REQ, "data": None})
-        while (response := self._client.read()) is None or response["type"] != codes.ROOM_CODE:
-            pass
-            pygame.time.wait(100)
-        self._scene_manager.context["mp_game"] = { "room": response["data"] }
-        self._scene_manager.change_scene("MultiplayerGameScene")
 
     def _create_room_event(self):
-        self._ensure_connection()
-        self._client.write({ "type": codes.CREATE_REQ, "data": None })
         self._scene_manager.context["loading"] = {
-            "continue": lambda: (response := self._client.read()) is not None and response["type"] == codes.ROOM_CREATE,
-            "on_load": lambda: self._start_game(),
+            "on_start": lambda: self._scene_manager.context["client"].create_room_req(),
+            "continue": lambda: (
+                (response := self._scene_manager.context["client"].read()) is not None and response["type"] == codes.ROOM_CREATED),
+            "on_load": lambda: self._scene_manager.change_scene("MultiplayerGameScene"),
             "previous_scene": lambda: self._scene_manager.change_scene("MultiplayerMenuScene")
         }
         self._scene_manager.restart_scene("LoadingScene")
         self._scene_manager.change_scene("LoadingScene")
 
-    def _join_room_event(self, code):
-        self._ensure_connection()
-        self._client.write({ "type": codes.JOIN_REQ, "data": code })
+    def _join_room_event(self, room_code):
         self._scene_manager.context["loading"] = {
-            "continue": lambda: (response := self._client.read()) is not None and response["type"] == codes.ROOM_JOIN,
-            "on_load": lambda: self._start_game(),
+            "on_start": lambda: self._scene_manager.context["client"].join_room_req(room_code),
+            "continue": lambda: (response := self._client.read()) is not None and response["type"] == codes.ROOM_JOINED,
+            "on_load": lambda: self._scene_manager.change_scene("MultiplayerGameScene"),
             "previous_scene": lambda: self._scene_manager.change_scene("MultiplayerMenuScene")
         }
         self._scene_manager.restart_scene("LoadingScene")
         self._scene_manager.change_scene("LoadingScene")
-
-    def _ensure_connection(self):
-        if self._client is None or not self._client.connected:
-            if "net" not in self._scene_manager.context or "client" not in self._scene_manager.context["net"]:
-                self._scene_manager.context["net"] = {"client": Client()}
-            self._client = self._scene_manager.context["net"]["client"]
-            self._client.connect()

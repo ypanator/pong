@@ -29,7 +29,7 @@ class Client:
         # Wait for connection with timeout
         start_time = pygame.time.get_ticks()
         while not self.connected:
-            if pygame.time.get_ticks() - start_time > 5000:
+            if pygame.time.get_ticks() - start_time > 2000:
                 return False
             pygame.time.wait(100)
         return True
