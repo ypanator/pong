@@ -88,9 +88,9 @@ class MultiplayerMenuScene:
     def _create_room_event(self):
         self._scene_manager.context["loading"] = {
             "on_start": lambda: self._scene_manager.context["client"].create_room_req(),
-            "continue": lambda: (
+            "success": lambda: (
                 (response := self._scene_manager.context["client"].read()) is not None and response["type"] == codes.ROOM_CREATED),
-            "on_load": lambda: self._scene_manager.change_scene("MultiplayerGameScene"),
+            "on_success": lambda: self._scene_manager.change_scene("MultiplayerGameScene"),
             "previous_scene": lambda: self._scene_manager.change_scene("MultiplayerMenuScene")
         }
         self._scene_manager.restart_scene("LoadingScene")
@@ -99,8 +99,8 @@ class MultiplayerMenuScene:
     def _join_room_event(self, room_code):
         self._scene_manager.context["loading"] = {
             "on_start": lambda: self._scene_manager.context["client"].join_room_req(room_code),
-            "continue": lambda: (response := self._client.read()) is not None and response["type"] == codes.ROOM_JOINED,
-            "on_load": lambda: self._scene_manager.change_scene("MultiplayerGameScene"),
+            "success": lambda: (response := self._client.read()) is not None and response["type"] == codes.ROOM_JOINED,
+            "on_success": lambda: self._scene_manager.change_scene("MultiplayerGameScene"),
             "previous_scene": lambda: self._scene_manager.change_scene("MultiplayerMenuScene")
         }
         self._scene_manager.restart_scene("LoadingScene")
