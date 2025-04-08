@@ -17,10 +17,10 @@ class LoadingScene:
         self._screen = pygame.display.get_surface()
         self._scene_manager = scene_manager
 
-        if "client" in self._scene_manager.context: 
-            self._client = self._scene_manager.context["client"]
-        else:
-            self._client = Client()
+        if not "client" in self._scene_manager.context or not self._scene_manager.context["client"] is not None: 
+            self._scene_manager.context["client"] = Client()
+            
+        self._client = self._scene_manager.context["client"]
         self._state = self.CONNECTING if self._client.connected else self.AWAIT_SUCCESS
         self._changed = True
 

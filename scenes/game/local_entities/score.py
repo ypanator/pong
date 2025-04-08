@@ -4,7 +4,6 @@ from constants import (
 )
 
 class Score(pygame.sprite.Sprite):
-    pygame.font.init()
     font = pygame.font.Font("retro_font.ttf", SCORE_FONT_SIZE)
 
     def render(self, score):

@@ -25,6 +25,7 @@ logging.basicConfig(
 
 # ================ pygame setup ================
 pygame.init()
+pygame.font.init()
 pygame.display.set_caption("pong")
 pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
