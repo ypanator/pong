@@ -96,3 +96,6 @@ class Client:
 
     def leave_room_req(self):
         self.write(Message(codes.LEAVE_REQ, None))
+    
+    def get_room_code_req(self):
+        self.write(Message(codes.GET_CODE_REQ, None))

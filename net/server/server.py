@@ -99,13 +99,22 @@ async def handle_msg(msg, state, writer):
 
         state.game_coro.players[id(writer)]["inputs"] = inputs
         
-        await write(writer, server_codes.POS_SEND, f"Position received.")
+        await write(writer, server_codes.POS_SEND, "Position received.")
     
     elif type == server_codes.LEAVE_REQ:
         if not state.in_room():
             await write(writer, server_codes.ERROR, "User is not connected to a room.")
             return
         leave_room(room_code, rooms_manager, writer, state)
+
+        await write(writer, server_codes.ROOM_LEFT, "User left the room.")
+
+    elif type == server_codes.GET_CODE_REQ:
+        if not state.in_room():
+            await write(writer, server_codes.ERROR, "User is not connected to a room.")
+            return    
+            
+        await write(writer, server_codes.ROOM_CODE, state.room_code)
 
     else:
         await write(writer, server_codes.ERROR, "Incorrect type provided.")
