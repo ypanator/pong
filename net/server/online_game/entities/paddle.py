@@ -23,11 +23,11 @@ class Paddle:
 
     def update(self, pressed, dt):
         x, y = self.rect.center
-        if pressed.up:
+        if pressed["up"]:
             y -= 5 * dt
-        if pressed.down:
+        if pressed["down"]:
             y += 5 * dt
-        if pressed.fire:
+        if pressed["fire"]:
             if time.time() * 1000 - self._fired_timestamp >= self._fired_timestep:
                 self._fired_timestamp = time.time() * 1000
                 self._paddle_fire_event.enable(self._is_left)

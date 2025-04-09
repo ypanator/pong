@@ -1,6 +1,6 @@
 import asyncio
-from net.server.online_game.online_game import OnlineGame
-from net.server.online_game.models import GameState
+from .online_game.online_game import OnlineGame
+from .online_game.models import GameState
 from dataclasses import dataclass, field
 
 
@@ -24,8 +24,13 @@ class RoomsManager:
     
     async def room_init(self, room_code):
         if not room_code in self._rooms:
+            print("Creating new room")
             self._rooms[room_code] = Room()
-            await self._rooms[room_code].game.coro.start()
+            print("Room created")
+            print("Starting game")
+            asyncio.create_task(self._rooms[room_code].game.coro.start())
+            print("Game task created")
+        print("code in rooms")
 
     def remove_room(self, room_code):
         del self._rooms[room_code]

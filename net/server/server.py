@@ -4,8 +4,8 @@ import random
 import string
 import net.server.server_codes as server_codes
 import time
-from net.server.client_state import ClientState
-from rooms_manager import RoomsManager
+from .client_state import ClientState
+from .rooms_manager import RoomsManager
 
 rooms_manager = RoomsManager()
 
@@ -17,21 +17,26 @@ async def handle_client(reader, writer):
     tasks = []
 
     broadcaster_timestamp = 0
-    broadcaster_timestep = 50
+    broadcaster_timestep = 0.016
 
     try:
         while True:
+            print("waiting for msg")
             msg = await reader.readline()
             if not msg:
                 break
             msg = json.loads(msg.decode())
             print(f"Received: {msg}")
 
+            # Process message first
             tasks.append(asyncio.create_task(handle_msg(msg, state, writer)))
 
+            # Then check if we should broadcast state
             if state.in_room() and rooms_manager.is_broadcaster(state.room_code, writer):
-                if time.monotonic() - broadcaster_timestamp >= broadcaster_timestep and state.game_state.is_updated:
-                    broadcaster_timestamp = time.monotonic()
+                curr_time = time.monotonic()
+                if curr_time - broadcaster_timestamp >= broadcaster_timestep:
+                    broadcaster_timestamp = curr_time
+                    print("Broadcasting state")  # Add debug print
                     tasks.append(asyncio.create_task(broadcast_state(state.writers, state.game_state)))
 
         await asyncio.gather(*tasks)
@@ -75,14 +80,23 @@ async def handle_msg(msg, state, writer):
         await write(writer, server_codes.ROOM_JOINED, f"Joined room: {room_code}")
 
     elif type == server_codes.CREATE_REQ:
+        print("creating room")
         if state.in_room():
             await write(writer, server_codes.ERROR, "User already in room.")
-            return  
-        room_code = generate_code()
-        await rooms_manager.room_init(room_code)
+            print("User already in room.")
+            return
         
+        room_code = generate_code()
+        print("code generated")
+        
+        # Create and initialize the room first
+        await rooms_manager.room_init(room_code)
+        print("room init finished")
+        
+        # Then join the room and notify client
         join_room(room_code, rooms_manager, writer, state)
-
+        print("room joined")
+        
         await write(writer, server_codes.ROOM_CREATED, f"Created and joined room: {room_code}")
 
     elif type == server_codes.NEW_INPUTS:
@@ -128,6 +142,7 @@ async def main():
 
 async def write(writer, type, data):
     writer.write((json.dumps({"type": type, "data": data}) + "\n").encode())
+    print(f"successfully sent {{'type': {type}, 'data': {data}}}")
     await writer.drain()
 
 async def broadcast_state(writers, state):

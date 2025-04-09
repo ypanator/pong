@@ -23,23 +23,4 @@ class OnlinePaddle(pygame.sprite.Sprite):
 
     # TODO: To change
     def update(self, pressed_keys, dt):
-        if self._is_left:
-            if pressed_keys[K_w]:
-                self._pos[1] -= 5 * dt
-            if pressed_keys[K_s]:
-                self._pos[1] += 5 * dt
-            if pressed_keys[K_d]:
-                pygame.event.post(pygame.event.Event(PADDLE_FIRE_EVENT, is_left=self._is_left))
-        else:
-            if pressed_keys[K_UP]:
-                self._pos[1] -= 5 * dt
-            if pressed_keys[K_DOWN]:
-                self._pos[1] += 5 * dt
-            if pressed_keys[K_LEFT]:
-                pygame.event.post(pygame.event.Event(PADDLE_FIRE_EVENT, is_left=self._is_left))
-
         self.rect.move_ip(0, self._pos[1] - self.rect.centery)
-        self._pos[1] = max(self._pos[1], PADDLE_HEIGHT / 2)
-        self._pos[1] = min(self._pos[1], SCREEN_HEIGHT - PADDLE_HEIGHT / 2)
-        self.rect.top = max(0, self.rect.top)
-        self.rect.bottom = min(SCREEN_HEIGHT, self.rect.bottom)

@@ -62,7 +62,7 @@ def update_game_state(state, paddle_left, paddle_right, ball):
     paddle_state['score'] = paddle_right.score
 
     ball_state = state['ball']
-    ball_state['is_left'] = ball.is_left
+    ball_state['is_left'] = ball._is_left
     ball_state['is_rolling'] = ball.is_rolling
     ball_state['x'] = ball.rect.centerx
     ball_state['y'] = ball.rect.centery

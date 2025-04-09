@@ -1,5 +1,6 @@
-from entities import Ball, Paddle
-from models import GameState, PlayerState, Event, disable_event, update_game_state
+from .entities.ball import Ball
+from .entities.paddle import Paddle
+from .models import GameState, PlayerState, Event, disable_event, update_game_state
 
 import asyncio
 import time
@@ -7,24 +8,28 @@ import time
 class OnlineGame:
 
     def __init__(self):
+        print("starting online game __init__")
         self.state = GameState()
         self.players = {}
 
         self._is_rollling = False
 
-        self._paddle_left = Paddle(True)
-        self._paddle_right = Paddle(False)
-        self._ball = Ball()
-        self._assignable_paddles = {self._paddle_left, self._paddle_right}
-        self._paddles = [self._paddle_left, self._paddle_right]
-
         self._paddle_fire_event = Event()
         self._reached_border_event = Event()
 
+        self._paddle_left = Paddle(True, self._paddle_fire_event)
+        self._paddle_right = Paddle(False, self._paddle_fire_event)
+        self._ball = Ball(self._reached_border_event)
+        self._assignable_paddles = {self._paddle_left, self._paddle_right}
+        self._paddles = [self._paddle_left, self._paddle_right]
+
+
         self._game_loop_timestamp = time.perf_counter_ns() // 1_000_000
         self._state_update_timestamp = time.perf_counter_ns() // 1_000_000
-        self._state_update_timestep = 50
+        self._state_update_timestep = 16
         self._time_slept = 0
+
+        print("game initalized")
 
     def add_player(self, id):
         if id not in self.players:
@@ -44,6 +49,7 @@ class OnlineGame:
         self._assignable_paddles.add(paddle)
 
     async def start(self):
+        print("starting")
         while True:
             await self._iterate()
 
@@ -72,7 +78,7 @@ class OnlineGame:
         for player in self.players.values():
             player["is_controlling"].update(player["inputs"], dt)
         self._ball.update(
-            dt, self._paddle_left.rect.center if self._ball.is_left else self._paddle_right.rect.center, self._paddles
+            dt, self._paddle_left.rect.center if self._ball._is_left else self._paddle_right.rect.center, self._paddles
         )
 
         if (time.perf_counter_ns() // 1_000_000) - self._state_update_timestamp >= self._state_update_timestep:

@@ -85,11 +85,15 @@ class OnlineMenuScene:
 
         pygame.display.flip()
 
+    def _success_create_room(self):
+        response = self._scene_manager.context["client"].read()
+        print(response if response is not None else "")
+        return response is not None and response["type"] == codes.ROOM_CREATED
+
     def _create_room_event(self):
         self._scene_manager.context["loading"] = {
             "on_start": lambda: self._scene_manager.context["client"].create_room_req(),
-            "success": lambda: (
-                (response := self._scene_manager.context["client"].read()) is not None and response["type"] == codes.ROOM_CREATED),
+            "success": lambda: self._success_create_room(),
             "on_success": lambda: self._scene_manager.change_scene("OnlineGameScene"),
             "previous_scene": lambda: self._scene_manager.change_scene("OnlineMenuScene")
         }

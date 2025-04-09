@@ -21,11 +21,11 @@ class LoadingScene:
             self._scene_manager.context["client"] = Client()
             
         self._client = self._scene_manager.context["client"]
-        self._state = self.CONNECTING if self._client.connected else self.AWAIT_SUCCESS
+        self._state = self.AWAIT_SUCCESS if self._client.connected else self.CONNECTING
         self._changed = True
 
-        self._success_timestamp = None
-        self._success_window = 5 * 1000
+        self._success_timestamp = pygame.time.get_ticks()
+        self._success_window = 15 * 1000
 
         self._connecting_start_timestamp = pygame.time.get_ticks()
         self._connecting_try_timestamp = 0
@@ -69,7 +69,7 @@ class LoadingScene:
         if self._state == self.CONNECTING:
             
             if pygame.time.get_ticks() - self._connecting_start_timestamp > self._connecting_window:
-                self._handle_error(Exception("Loading time exceeded."))
+                self._handle_error(Exception("Loading time exceeded connecting."))
                 return
             
             if pygame.time.get_ticks() - self._connecting_try_timestamp > self._connecting_try_timestep:
@@ -84,7 +84,7 @@ class LoadingScene:
         elif self._state == self.AWAIT_SUCCESS:
 
             if pygame.time.get_ticks() - self._success_timestamp > self._success_window:
-                self._handle_error(Exception("Loading time exceeded."))
+                self._handle_error(Exception("Loading time exceeded for success."))
                 return
             
             if self._success():

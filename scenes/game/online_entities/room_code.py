@@ -3,6 +3,7 @@ from constants import SCREEN_HEIGHT
 
 class RoomCode(pygame.sprite.Sprite):
     FONT_SIZE = 10
+    pygame.font.init()
     font = pygame.font.Font("retro_font.ttf", FONT_SIZE)
 
     def _render(self, text):

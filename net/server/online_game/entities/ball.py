@@ -1,7 +1,7 @@
 import pygame
 import random
 import math
-from models import enable_event
+from ..models import enable_event
 
 from constants import (
     SCREEN_WIDTH, SCREEN_HEIGHT, PADDLE_HEIGHT, BALL_ACCELERATION,
@@ -84,10 +84,12 @@ class Ball:
         self.rect.center = (x, y)
 
 
-    def follow_player(self, player_y):
+    def follow_player(self, player_pos):
         x, y = self.rect.center
         x = BALL_OFFSET if self._is_left else SCREEN_WIDTH - BALL_OFFSET
-        y = player_y
+        y = player_pos[1]
+        assert isinstance(x, int)
+        assert isinstance(y, int)
         self.rect.center = (x, y)
         
 

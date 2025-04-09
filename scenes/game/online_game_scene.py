@@ -26,7 +26,7 @@ class OnlineGameScene:
         assert self._client is not None
 
         self._send_inputs_timestamp = pygame.time.get_ticks()
-        self._send_inputs_timestep = 50
+        self._send_inputs_timestep = 16
         self._inputs = Inputs()
 
         self._screen = pygame.display.get_surface()
@@ -99,13 +99,15 @@ class OnlineGameScene:
             
         pygame.display.flip()
     
-    def _handle_messages(self):
+    def _handle_messages(self):  # Debug print
         while (msg := self._client.read()) is not None:
+            print(f"Received message: {msg}")  # More detailed print
             type = msg["type"]
             if type == codes.ROOM_CODE:
                 self._room_code.update(msg["data"])
-
+                print("Updated room code")
             elif type == codes.NEW_STATE:
+                print("Got new state")  # Debug print
                 self._inject_state(msg["data"])
 
             elif type == codes.ERROR:

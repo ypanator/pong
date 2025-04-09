@@ -4,6 +4,7 @@ from constants import (
 )
 
 class Score(pygame.sprite.Sprite):
+    pygame.font.init()
     font = pygame.font.Font("retro_font.ttf", SCORE_FONT_SIZE)
 
     def render(self, score):
@@ -11,7 +12,7 @@ class Score(pygame.sprite.Sprite):
 
     def __init__(self, is_left):
         super().__init__()
-        
+
         self.surf = self.render(0)
         self.surf.set_colorkey("black")
         self.rect = self.surf.get_rect(center = (
