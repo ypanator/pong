@@ -40,6 +40,7 @@ class OnlineGameScene:
         self._score_left = Score(True)
         self._score_right = Score(False)
         self._middle_line = MiddleLine()
+        self._room_code = RoomCode()
 
         self._drawables = pygame.sprite.Group()
         self._paddles = pygame.sprite.Group()
@@ -48,13 +49,12 @@ class OnlineGameScene:
 
         self._is_rolling = False
 
-        self._room_code = RoomCode()
 
     def iterate(self, tick):
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 if event.key in (K_q, K_ESCAPE):
-                    self._scene_manager.change_scene("MultiplayerMenuScene")
+                    self._scene_manager.change_scene("OnlineMenuScene")
             
             if event.type == QUIT:
                 self._scene_manager.close()
@@ -84,7 +84,7 @@ class OnlineGameScene:
         self._ball.update(dt, self._is_rolling, 
             self._paddle_left._pos if self._ball._is_left else self._paddle_right._pos, self._paddles
         )
-        self.handle_messages()
+        self._handle_messages()
 
         if pygame.time.get_ticks() - self._send_inputs_timestamp > self._send_inputs_timestep:
             self._inputs["up"] = pressed_keys[K_w]
@@ -99,17 +99,41 @@ class OnlineGameScene:
             
         pygame.display.flip()
     
-    def handle_messages(self):
+    def _handle_messages(self):
         while (msg := self._client.read()) is not None:
             type = msg["type"]
             if type == codes.ROOM_CODE:
                 self._room_code.update(msg["data"])
 
             elif type == codes.NEW_STATE:
-                pass # TODO:
+                self._inject_state(msg["data"])
 
             elif type == codes.ERROR:
                 self._logger.error(msg)
             
             else:
                 self._logger.debug(msg)
+        
+    def _inject_state(self, state):
+        lpaddle_state = state["paddles"][0]
+        rpaddle_state = state["paddles"][1]
+        ball_state = state["ball"]
+
+        self._paddle_left._pos[0] = lpaddle_state["x"]
+        self._paddle_left._pos[1] = lpaddle_state["y"]
+        self._paddle_left._score = lpaddle_state["score"]
+
+        self._paddle_right._pos[0] = rpaddle_state["x"]
+        self._paddle_right._pos[1] = rpaddle_state["y"]
+        self._paddle_right._score = rpaddle_state["score"]
+
+        self._ball._is_left = ball_state["is_left"]
+        self._ball.is_rolling = ball_state["is_rolling"]
+        self._ball._pos[0] = ball_state["x"]
+        self._ball._pos[1] = ball_state["y"]
+        self._ball._xv = ball_state["xv"]
+        self._ball._yv = ball_state["yv"]
+        self._ball._vel = ball_state["vel"]
+
+        self._score_left.update(self._paddle_left._score)
+        self._score_right.update(self._paddle_right._score)

@@ -65,9 +65,9 @@ class OnlineGame:
             self._ball.reset(self._reached_border_event.is_left)
             disable_event(self._reached_border_event)
 
-        time = (time.perf_counter_ns() // 1_000_000) - self._game_loop_timestamp - self._time_slept
+        frame_time = (time.perf_counter_ns() // 1_000_000) - self._game_loop_timestamp - self._time_slept
         self._game_loop_timestamp = time.perf_counter_ns() // 1_000_000
-        dt = time / 1000 * 60
+        dt = frame_time / 1000 * 60
 
         for player in self.players.values():
             player["is_controlling"].update(player["inputs"], dt)
@@ -79,5 +79,5 @@ class OnlineGame:
             update_game_state(self.state, self._paddle_left, self._paddle_right, self._ball)
             self._state_update_timestamp = time.perf_counter_ns() // 1_000_000
 
-        self._time_slept = max(0, 1 / 60 * 1000 - time)
+        self._time_slept = max(0, 1 / 60 * 1000 - frame_time)
         await asyncio.sleep(self._time_slept // 1000)

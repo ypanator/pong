@@ -25,8 +25,8 @@ def GameState():
     return {
         'is_updated': False,
         'paddles': [
-            PaddleState(False),
-            PaddleState(True)
+            PaddleState(True),
+            PaddleState(False)
         ],
         'ball': BallState()
     }

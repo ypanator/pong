@@ -9,7 +9,7 @@ from pygame.locals import (
     K_q, K_ESCAPE, KEYDOWN, QUIT
 )
 
-class MultiplayerMenuScene:
+class OnlineMenuScene:
 
     def __init__(self, scene_manager):
         self._screen = pygame.display.get_surface()
@@ -90,8 +90,8 @@ class MultiplayerMenuScene:
             "on_start": lambda: self._scene_manager.context["client"].create_room_req(),
             "success": lambda: (
                 (response := self._scene_manager.context["client"].read()) is not None and response["type"] == codes.ROOM_CREATED),
-            "on_success": lambda: self._scene_manager.change_scene("MultiplayerGameScene"),
-            "previous_scene": lambda: self._scene_manager.change_scene("MultiplayerMenuScene")
+            "on_success": lambda: self._scene_manager.change_scene("OnlineGameScene"),
+            "previous_scene": lambda: self._scene_manager.change_scene("OnlineMenuScene")
         }
         self._scene_manager.restart_scene("LoadingScene")
         self._scene_manager.change_scene("LoadingScene")
@@ -99,9 +99,10 @@ class MultiplayerMenuScene:
     def _join_room_event(self, room_code):
         self._scene_manager.context["loading"] = {
             "on_start": lambda: self._scene_manager.context["client"].join_room_req(room_code),
-            "success": lambda: (response := self._client.read()) is not None and response["type"] == codes.ROOM_JOINED,
-            "on_success": lambda: self._scene_manager.change_scene("MultiplayerGameScene"),
-            "previous_scene": lambda: self._scene_manager.change_scene("MultiplayerMenuScene")
+            "success": lambda: (
+                (response := self._scene_manager.context["client"].read()) is not None and response["type"] == codes.ROOM_JOINED),
+            "on_success": lambda: self._scene_manager.change_scene("OnlineGameScene"),
+            "previous_scene": lambda: self._scene_manager.change_scene("OnlineMenuScene")
         }
         self._scene_manager.restart_scene("LoadingScene")
         self._scene_manager.change_scene("LoadingScene")

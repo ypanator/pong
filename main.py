@@ -2,9 +2,10 @@ import pygame
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 
 from scenes.scene_manager import SceneManager
-from scenes.local_game.local_game_scene import LocalGameScene
+from scenes.game.local_game_scene import LocalGameScene
+from scenes.game.online_game_scene import OnlineGameScene
 from scenes.main_menu_scene import MainMenuScene
-from scenes.multiplayer_menu_scene import MultiplayerMenuScene
+from scenes.online_menu_scene import OnlineMenuScene
 from scenes.loading_scene import LoadingScene
 
 import logging
@@ -32,8 +33,9 @@ pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 scenes = {
     "LocalGameScene": LocalGameScene,
     "MainMenuScene": MainMenuScene,
-    "MultiplayerMenuScene": MultiplayerMenuScene,
-    "LoadingScene": LoadingScene
+    "OnlineMenuScene": OnlineMenuScene,
+    "LoadingScene": LoadingScene,
+    "OnlineGameScene": OnlineGameScene
 }
 scene_manager = SceneManager(scenes, "MainMenuScene")
 

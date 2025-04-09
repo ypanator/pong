@@ -83,7 +83,7 @@ async def handle_msg(msg, state, writer):
         
         join_room(room_code, rooms_manager, writer, state)
 
-        await write(writer, server_codes.ROOM_CREATE, f"Created and joined room: {room_code}")
+        await write(writer, server_codes.ROOM_CREATED, f"Created and joined room: {room_code}")
 
     elif type == server_codes.NEW_INPUTS:
         inputs = msg["data"]
@@ -105,7 +105,7 @@ async def handle_msg(msg, state, writer):
         if not state.in_room():
             await write(writer, server_codes.ERROR, "User is not connected to a room.")
             return
-        leave_room(room_code, rooms_manager, writer, state)
+        leave_room(state.room_code, rooms_manager, writer, state)
 
         await write(writer, server_codes.ROOM_LEFT, "User left the room.")
 

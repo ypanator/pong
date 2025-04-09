@@ -26,7 +26,7 @@ class MainMenuScene:
         self._multiplayer_button = Button(
             SCREEN_WIDTH // 2, self._local_play_button.rect.bottom + MAIN_MENU_OFFSET + MAIN_MENU_BUTTON_HEIGHT // 2, 
             MAIN_MENU_BUTTON_WIDTH, MAIN_MENU_BUTTON_HEIGHT, MAIN_MENU_BUTTON_BORDER, 
-            "multiplayer", lambda: scene_manager.change_scene("MultiplayerMenuScene")
+            "multiplayer", lambda: scene_manager.change_scene("OnlineMenuScene")
         )
 
         self._screen = pygame.display.get_surface()
